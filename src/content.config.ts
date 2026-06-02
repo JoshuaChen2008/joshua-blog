@@ -46,6 +46,7 @@ const noteSchema = z.object({
   date: z.coerce.date(),
   // Optional
   description: z.string().optional(),
+  accentColor: z.string().optional(),
   updatedDate: z.coerce.date().optional(),
   tags: z.array(z.string()).default([]).transform(removeDupsAndLowerCase),
   // Type of archive entry: note, snippet, draft, idea, research, etc.

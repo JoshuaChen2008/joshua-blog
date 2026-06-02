@@ -25,6 +25,7 @@ const { Content } = await render(entry)
 const {
   title,
   description,
+  accentColor,
   date,
   updatedDate,
   tags,
@@ -69,9 +70,10 @@ const meta = {
   title,
   description: description || title
 }
+const primaryColor = accentColor ?? 'hsl(var(--primary) / var(--un-text-opacity))'
 ---
 
-<PageLayout {meta} back='/note'>
+<PageLayout {meta} highlightColor={primaryColor} back='/note'>
   <div slot='header' class='animate gap-y-4'>
     <div class='mb-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground'>
       <span class='rounded-md bg-muted px-2 py-1'>{typeLabels[type] || type}</span>

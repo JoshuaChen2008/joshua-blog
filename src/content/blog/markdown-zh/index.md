@@ -119,12 +119,24 @@ $$
 #### 图片
 
 ```markdown
-![CWorld](https://gravatar.loli.net/avatar/1ffe42aa45a6b1444a786b1f32dfa8aa?s=200)
+<img
+  src="https://gravatar.loli.net/avatar/1ffe42aa45a6b1444a786b1f32dfa8aa?s=200"
+  alt="CWorld"
+  class="zoomable"
+  width="200"
+  height="200"
+/>
 ```
 
 预览：
 
-![CWorld](https://gravatar.loli.net/avatar/1ffe42aa45a6b1444a786b1f32dfa8aa?s=200)
+<img
+  src="https://gravatar.loli.net/avatar/1ffe42aa45a6b1444a786b1f32dfa8aa?s=200"
+  alt="CWorld"
+  class="zoomable"
+  width="200"
+  height="200"
+/>
 
 #### 删除线
 

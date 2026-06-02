@@ -135,7 +135,7 @@ export default defineConfig({
     svgo: true,
     // Enables pre-rendering your prefetched pages on the client in supported browsers.
     // https://docs.astro.build/en/reference/experimental-flags/client-prerender/
-    clientPrerender: true,
+    clientPrerender: false,
     // Enables using the new Rust-based compiler for Astro files.
     // https://docs.astro.build/en/reference/experimental-flags/rust-compiler/
     rustCompiler: false,
