@@ -10,10 +10,13 @@ import alipay from '@/assets/alipay-qrcode.jpg'
 import KeyIcon from '@/assets/icons/key.svg'
 import wechat from '@/assets/wechat-qrcode.jpg'
 import { Card } from 'astro-pure/user'
+
+import GitHubContributions from '@/components/projects/GitHubContributions.astro'
+
+
 const headings = [
   { depth: 2, slug: 'programs', text: 'Programs' },
   { depth: 2, slug: 'learnings', text: 'Learnings' },
-  { depth: 2, slug: 'others', text: 'Others' },
     { depth: 2, slug: 'Theme', text: 'Theme' }
  /* { depth: 2, slug: 'gpg-signature', text: 'GPG Signature' },
   { depth: 2, slug: 'sponsorship', text: 'Sponsorship' }*/
@@ -33,16 +36,9 @@ const headings = [
        <p class='font-medium text-muted-foreground'>About Astro-Theme-Pure Project</p>*/}
     </a>
   </div>
-  <Card
-  <p>Github Activities:</p>
-  <p>
-    <img
-      src='https://ghchart.rshah.org/659eb9/cworld1'
-      alt='github activities'
-      inferSize
-      loading='lazy'
-    />
-  </p></Card>
+  
+ <p>Github Activities:</p>
+<GitHubContributions username='JoshuaChen2008' />
  {/* <p>
     If you think it would be useful or interesting to collaborate on a project, you can donate to
     support my work or contact me to discuss a project.
@@ -55,27 +51,22 @@ const headings = [
   <ProjectSection
     projects={[
       {
-        name: '🎨 Astro Theme Pure',
-        description: 'A simple, fast and powerful blog & document theme built by Astro',
+        name: 'Pot-App-translate-plugin-TencentTMT',
+        description: 'A simple plugin for pot',
         links: [
-          { type: 'github', href: 'https://github.com/cworld1/astro-theme-pure' },
-          { type: 'site', href: 'https://astro-pure.js.org/' },
-          { type: 'doc', href: 'https://astro-pure.js.org/docs/list' },
-          { type: 'release', href: 'https://www.npmjs.com/package/astro-pure' }
+          { type: 'github', href: 'https://github.com/JoshuaChen2008/pot-app-translate-plugin-TencentTMT' },
         ]
       },
       {
-        name: '💄 PKU Art',
-        description: 'A script to beautify pku course website',
+        name: 'A-type-game-of-web',
+        description: '一个用Vite手脚架搭建的React+TypeScript的前端项目，用来练习React+ts',
         links: [
-          { type: 'github', href: 'https://github.com/zhuozhiyongde/pku-art' },
-          { type: 'site', href: 'https://github.com/zhuozhiyongde/pku-art' },
-          { type: 'doc', href: 'https://docs.arthals.ink/docs/pku-art' }
+          { type: 'github', href: 'https://github.com/JoshuaChen2008/A-type-game-of-web' },
         ]
       }
     ]}
   />
-  <Collapse title='Some old projects'>
+  {/* <Collapse title='Some old projects'>
     <ProjectSection
       projects={[
         {
@@ -97,34 +88,23 @@ const headings = [
         }
       ]}
     />
-  </Collapse>
+  </Collapse>*/}
 
   <h2 id='learnings'>Learnings</h2>
   <ProjectSection
     class='my-2'
     projects={[
       {
-        name: 'R Learning',
-        description: 'Some notes and code about learning R language',
+        name: 'llm-mcp-rag-learning-source',
+        description: 'RAG向量检索和MCP与agent的结合的demo，用于学习Agent的逻辑',
         links: [
-          { type: 'github', href: 'https://github.com/cworld1/r-learning' },
-          { type: 'site', href: 'https://cworld1.github.io/r-learning' }
-        ]
-      },
-      {
-        name: 'CS 213 Learning',
-        description: 'Notes, code and experiences for Introduction to Computer Systems course',
-        links: [
-          {
-            type: 'github',
-            href: 'https://github.com/zhuozhiyongde/Introduction-To-Computer-System-2023Fall-PKU'
-          }
+          { type: 'github', href: 'https://github.com/JoshuaChen2008/llm-mcp-rag-learning-source' },
         ]
       }
     ]}
   />
 
-  <h2 id='others'>Others</h2>
+  {/* <h2 id='others'>Others</h2>
   <ProjectSection
     projects={[
       {
@@ -138,7 +118,7 @@ const headings = [
         links: [{ type: 'github', href: 'https://github.com/zhuozhiyongde' }]
       }
     ]}
-  />
+  />*/}
     <h2 id='Theme'>Theme</h2>
   <ProjectSection
     projects={[
