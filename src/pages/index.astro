@@ -1,0 +1,160 @@
+---
+import { Image } from 'astro:assets'
+
+import { Quote } from 'astro-pure/advanced'
+import { PostPreview } from 'astro-pure/components/pages'
+import { getBlogCollection, sortMDByDate } from 'astro-pure/server'
+import { Button, Card, Icon, Label } from 'astro-pure/user'
+import PageLayout from '@/layouts/BaseLayout.astro'
+import ProjectCard from '@/components/home/ProjectCard.astro'
+import Section from '@/components/home/Section.astro'
+import SkillLayout from '@/components/home/SkillLayout.astro'
+import config from '@/site-config'
+
+const languages = ['TypeScript', 'JavaScript', 'Java', 'SQL']
+const frontend = ['Next.js', 'React', 'TailWind CSS', 'Vite']
+const backend = ['Vercel', 'Node.js','MongoDB']
+const Agent = ['Claude Code','Transformer','Multi-Agent','LLM','RAG','Prompt Engineering','Function Calling']
+const Tools = ['Codex','Opencode','Git','Docker','Figma','Stitch']
+
+const MAX_POSTS = 10
+const allPosts = await getBlogCollection()
+const allPostsByDate = sortMDByDate(allPosts).slice(0, MAX_POSTS)
+
+const imagePath = config.logo.src
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/*.{jpeg,jpg,png,gif,avif,webp}'
+)
+if (!images[imagePath])
+  throw new Error(
+    `"${imagePath}" does not exist in glob: "src/assets/*.{jpeg,jpg,png,gif,avif,webp}"`
+  )
+---
+
+<PageLayout meta={{ title: 'Home' }} highlightColor='#659EB9'>
+  <main class='flex w-full flex-col items-center'>
+    <section class='animate mb-10 flex flex-col items-center gap-y-7' id='content-header'>
+      <Image
+        src={images[imagePath]()}
+        alt={config.logo.alt || 'Profile'}
+        class='h-28 w-auto rounded-full border p-1'
+        loading='eager'
+        fetchpriority='high'
+      />
+
+      <div class='flex flex-col items-center gap-y-4'>
+        <h1 class='text-3xl font-medium'>{config.author}</h1>
+        <div class='flex flex-wrap justify-center gap-x-7 gap-y-3'>
+          <Label title='中国 天津/杭州'>
+            <Icon name='location' class='size-5' slot='icon' />
+          </Label>
+          <Label
+            title='GitHub'
+            as='a'
+            href='https://github.com/JoshuaChen2008'
+            target='_blank'
+          >
+            <Icon name='github' class='size-5' slot='icon' />
+          </Label>
+        </div>
+      </div>
+
+      {/* Get template */}
+      <a
+        target='_blank'
+        class='flex flex-row items-center gap-x-3 rounded-full border bg-background px-4 py-2 text-sm shadow-sm transition-shadow hover:shadow-md'
+      >
+        <span class='relative flex items-center justify-center'>
+          <span
+            class='absolute size-2 animate-ping rounded-full border border-green-400 bg-green-400 opacity-75'
+          ></span>
+          <span class='size-2 rounded-full bg-green-400'></span>
+        </span>
+        <p class='font-medium text-muted-foreground'>Online</p>
+      </a>
+    </section>
+
+    <div id='content' class='animate flex flex-col gap-y-10 md:w-4/5 lg:w-5/6'>
+      <Section title='About'>
+        <p class='text-muted-foreground'>AI Agent & Full-Stack Developer</p>
+        <p class='text-muted-foreground'>
+            天津理工大学在读，目前为大一学生，致力于研究和开发有用且有趣的产品，正在学习LLM和Agent开发，喜欢将新技术用于工程实践中，在意产品能不能真正跑起来，也在意市场的反馈
+        </p>
+        <Button title='More about me' class='w-fit self-end' href='/about' variant='ahead' />
+      </Section>
+      {
+        allPostsByDate.length > 0 && (
+          <Section title='Posts'>
+            <ul class='flex flex-col gap-y-1.5 sm:gap-y-2'>
+              {allPostsByDate.map((p) => (
+                <li class='flex flex-col gap-x-2 sm:flex-row'>
+                  <PostPreview post={p} />
+                </li>
+              ))}
+            </ul>
+            <Button title='More posts' class='w-fit self-end' href='/blog' variant='ahead' />
+          </Section>
+        )
+      }
+
+      
+        <Section title='Experience'>
+      <Card
+        heading='杭州星业品牌管理有限公司'
+        subheading='直播运营助理'
+        date='7月 2025 - 9月 2026'
+        imagePath='/src/assets/about-astro.png'
+        altText='Lorem, ipsum dolor sit'
+        imageClass='h-12 w-auto md:-start-16'
+      />
+    </Section> 
+
+        <Section title='Open Source'>
+        <Card
+          as='a'
+          heading='pot-app-translate-plugin-TencentTMT'
+          subheading='腾讯云机器翻译 TMT 插件 - 一个为 Pot 开发的翻译插件。'
+          date='9月 2025 - 6月 2029'>
+        </Card>
+       
+
+        <Card
+          as='a'
+          heading='A-type-game-of-web'
+          subheading='基于React+TypeScript+TailwindCSS的打字网站'
+          date='9月 2025 - 6月 2029'
+        ></Card>  </Section>
+
+      
+      <Section title='Education'>
+        <Card
+          as='a'
+          heading='天津理工大学'
+          subheading='理学学士 - 计算机类'
+          date='9月 2025 - 6月 2029'
+        >
+          {
+            /* <ul class='ms-4 list-disc text-muted-foreground'>
+          <li>
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dolore debitis recusandae, ut
+            molestiae laboriosam pariatur!
+          </li>
+          <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae, pariatur!</li>
+        </ul> */
+          }
+        </Card>
+      </Section>
+
+      
+
+      <Section title='Skills'>
+        <SkillLayout title='Languages' skills={languages} />
+        <SkillLayout title='Frontend' skills={frontend} />
+        <SkillLayout title='Backend' skills={backend} />
+        <SkillLayout title='AI & Agent' skills={Agent} />
+        <SkillLayout title='Tools' skills={Tools} />
+      </Section>
+    </div>
+    <Quote class='mt-12' />
+  </main>
+</PageLayout>
