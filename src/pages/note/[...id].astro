@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets'
 import { render, type CollectionEntry } from 'astro:content'
 import { getCollection } from 'astro:content'
 import PageLayout from '@/layouts/ContentLayout.astro'
@@ -26,6 +27,7 @@ const {
   title,
   description,
   accentColor,
+  heroImage,
   date,
   updatedDate,
   tags,
@@ -66,15 +68,35 @@ const typeLabels: Record<string, string> = {
   reference: '📚 Reference'
 }
 
+const socialImage = heroImage
+  ? typeof heroImage.src === 'string'
+    ? heroImage.src
+    : heroImage.src.src
+  : undefined
 const meta = {
   title,
-  description: description || title
+  description: description || title,
+  ogImage: socialImage
 }
-const primaryColor = accentColor ?? 'hsl(var(--primary) / var(--un-text-opacity))'
+const primaryColor = accentColor ?? heroImage?.color ?? 'hsl(var(--primary) / var(--un-text-opacity))'
 ---
 
 <PageLayout {meta} highlightColor={primaryColor} back='/note'>
   <div slot='header' class='animate gap-y-4'>
+    {
+      heroImage && (
+        <div class='relative mb-6'>
+          <Image
+            alt={heroImage.alt || title}
+            class='h-auto w-full max-w-[65ch] rounded-2xl object-contain'
+            fetchpriority='high'
+            loading='eager'
+            {...heroImage}
+          />
+        </div>
+      )
+    }
+
     <div class='mb-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground'>
       <span class='rounded-md bg-muted px-2 py-1'>{typeLabels[type] || type}</span>
       <span class='rounded-md bg-muted px-2 py-1'>{statusLabels[status] || status}</span>

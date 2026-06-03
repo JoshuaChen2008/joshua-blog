@@ -4,7 +4,7 @@ title: "LLM+MCP+RAG demo的实现"
 description: "llm+mcp+rag的mvp项目的笔记"
 date: 2026-05-24
 accentColor: "#4891B2"
-tags: ["Agent", "RAG","MCP]
+tags: ["Agent", "RAG", "MCP"]
 type: "note"
 status: "incomplete"
 

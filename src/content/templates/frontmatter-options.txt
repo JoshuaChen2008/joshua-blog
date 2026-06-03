@@ -57,7 +57,15 @@ Optional:
     Short description for lists/search.
 
   accentColor: string
-    Highlight/accent color for the note UI when used by the page.
+    Highlight/accent color for the note UI. This takes priority over heroImage.color.
+
+  heroImage:
+    src: local image path, usually './thumbnail.jpg' or './image.png'
+    alt: image alt text
+    inferSize: boolean
+    width: number
+    height: number
+    color: string, used as the note highlight color when accentColor is not set
 
   updatedDate: date
     Last update date.
@@ -88,4 +96,3 @@ Optional:
 
   source: URL string
     External source/reference URL.
-
