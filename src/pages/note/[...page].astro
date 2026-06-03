@@ -14,7 +14,7 @@ import PageLayout from '@/layouts/BaseLayout.astro'
 import NotePreview from '@/components/notes/NotePreview.astro'
 import { PageInfo } from '@/components/waline'
 
-import { statusDotColors, statusLabels } from '../../lib/noteMeta'
+import { statusColors, statusLabels } from '../../lib/noteMeta'
 
 export const prerender = true
 
@@ -150,9 +150,11 @@ const paginationProps = {
                   <li class='flex items-center justify-between gap-3'>
                     <span class='flex items-center gap-2'>
                       <span
-                        class={`inline-block size-2 rounded-full ${statusDotColors[status] || 'bg-gray-400'}`}
-                      />
-                      <span class='text-foreground'>{statusLabels[status] || status}</span>
+                        class={`rounded-md px-2 py-0.5 text-xs font-medium        
+                      ${statusColors[status] || 'bg-gray-100 text-gray-600 dark:bg-gray-800/30 dark:text-gray-400'}`}
+                      >
+                        {statusLabels[status] || status}
+                      </span>{' '}
                     </span>
                     <span class='text-xs text-muted-foreground'>{statusCounts[status] || 0}</span>
                   </li>

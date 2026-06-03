@@ -2,6 +2,7 @@ import type { TypographyOptions } from '@unocss/preset-typography'
 import { defineConfig, presetMini, presetTypography, type Rule } from 'unocss'
 
 import { integ } from './src/site.config.ts'
+import { statusColors, statusDotColors, typeColors } from './src/lib/noteMeta.ts'
 
 const typographyCustom = integ.typography || {}
 
@@ -142,6 +143,12 @@ const themeColors = {
   ring: 'hsl(var(--ring) / <alpha-value>)'
 }
 
+const dynamicNoteColorClasses = [
+  ...Object.values(statusColors),
+  ...Object.values(statusDotColors),
+  ...Object.values(typeColors)
+].flatMap((classes) => classes.split(/\s+/).filter(Boolean))
+
 const rules: Rule<object>[] = [
   // Fix unocss presetMini
   [
@@ -187,6 +194,7 @@ export default defineConfig({
     'rounded-b-2xl',
     // Typography
     'text-base',
-    'prose'
+    'prose',
+    ...new Set(dynamicNoteColorClasses)
   ]
 })
