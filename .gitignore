@@ -31,7 +31,17 @@ node_modules/
 
 # environment variables
 .env
-.env.production
+.env.*
+!.env.example
+!.env.*.example
+
+# secrets and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
 
 ### Custom ###
 .DS_Store
