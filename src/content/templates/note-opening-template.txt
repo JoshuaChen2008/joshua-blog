@@ -1,0 +1,33 @@
+Note opening template
+
+Copy the frontmatter below into a new file under:
+  src/content/note/your-note-name.md
+  src/content/note/your-note-name.mdx
+
+This template is a .txt file under src/content/templates, so Astro will not load it
+as a note entry.
+
+---
+title: '笔记标题'
+date: 2026-06-04
+tags:
+  - note
+type: 'note'
+status: 'in-progress'
+
+# Optional fields
+# description: '笔记摘要'
+# accentColor: '#83d5d0'
+# updatedDate: 2026-06-04
+# draft: false
+# language: 'Chinese'
+# translationKey: 'shared-note-key'
+# relatedBlog:
+#   - FristBlog
+# relatedNote:
+#   - 2026.05.26
+# source: 'https://example.com'
+---
+
+笔记正文从这里开始。
+

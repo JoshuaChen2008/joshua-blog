@@ -1,0 +1,91 @@
+Frontmatter options for this project
+
+These templates are placed in src/content/templates and use the .txt extension.
+Your current Astro loaders only load:
+  - src/content/blog/**/*.{md,mdx}
+  - src/content/note/**/*.{md,mdx}, except *.en.md and *.en.mdx
+
+So these .txt templates will not be recognized as content entries.
+
+Blog fields
+
+Required:
+  title: string
+    Article title. Max length: 60.
+
+  description: string
+    Article summary. Max length: 160.
+
+  publishDate: date
+    Publish date. Examples: 2026-06-04, '2026-06-04T00:00:00Z'.
+
+Optional:
+  updatedDate: date
+    Last update date.
+
+  heroImage:
+    src: local image path, usually './thumbnail.jpg' or './image.png'
+    alt: image alt text
+    inferSize: boolean
+    width: number
+    height: number
+    color: string, used as the article highlight color
+
+  tags: string[]
+    Defaults to []. The schema lowercases tags and removes duplicates.
+
+  language: string
+    Displayed in the article header, e.g. 'Chinese' or 'English'.
+
+  draft: boolean
+    Defaults to false. When true, the article is treated as draft.
+
+  comment: boolean
+    Defaults to true. Controls whether comments/page info render for the post.
+
+Note fields
+
+Required:
+  title: string
+    Note title.
+
+  date: date
+    Note creation/publish date.
+
+Optional:
+  description: string
+    Short description for lists/search.
+
+  accentColor: string
+    Highlight/accent color for the note UI when used by the page.
+
+  updatedDate: date
+    Last update date.
+
+  tags: string[]
+    Defaults to []. The schema lowercases tags and removes duplicates.
+
+  type: 'note' | 'snippet' | 'draft' | 'idea' | 'research' | 'reference'
+    Defaults to 'note'.
+
+  status: 'in-progress' | 'incomplete' | 'ready' | 'archived'
+    Defaults to 'in-progress'.
+
+  draft: boolean
+    Defaults to false.
+
+  language: string
+    Used by this project for English mirrors / language metadata.
+
+  translationKey: string
+    Shared key for translated versions of the same content.
+
+  relatedBlog: string[]
+    Related blog entry ids.
+
+  relatedNote: string[]
+    Related note entry ids.
+
+  source: URL string
+    External source/reference URL.
+

@@ -1,0 +1,27 @@
+Blog article opening template
+
+Copy the frontmatter below into a new file under:
+  src/content/blog/your-post-slug/index.md
+  src/content/blog/your-post-slug/index.mdx
+
+This template is a .txt file under src/content/templates, so Astro will not load it
+as a blog entry.
+
+---
+title: '文章标题，最多 60 个字符'
+publishDate: 2026-06-04
+description: '文章摘要，最多 160 个字符'
+tags:
+  - Blog
+  - 日常
+
+# Optional fields
+# updatedDate: 2026-06-04
+# language: 'Chinese'
+# draft: false
+# comment: true
+# heroImage: { src: './thumbnail.jpg', alt: '封面图描述', color: '#83d5d0' }
+---
+
+文章正文从这里开始。
+
