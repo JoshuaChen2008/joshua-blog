@@ -40,7 +40,13 @@ const blog = defineCollection({
       comment: z.boolean().default(true)
     })
 })
-const noteSchema = z.object({
+
+
+
+
+
+const noteSchema =
+    z.object({
   // Required
   title: z.string(),
   date: z.coerce.date(),
@@ -56,6 +62,7 @@ const noteSchema = z.object({
   draft: z.boolean().default(false),
   // For English mirrors: the Chinese entry's id (e.g. `0326-foo`). Drives en routing + hreflang.
   language: z.string().optional(),
+    
   translationKey: z.string().optional(),
   // Relationships - connect note entries to blog posts and other notes
   relatedBlog: z.array(z.string()).optional(),
