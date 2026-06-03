@@ -12,37 +12,43 @@ const cards = [
     className: 'im-cta-photo-1',
     href: 'https://openai.com/index/codex/',
     label: 'Codex',
-    icon: codexIcon
+    icon: codexIcon,
+    labelSide: 'right'
   },
   {
     className: 'im-cta-photo-2',
     href: 'https://claude.ai',
     label: 'Claude',
-    icon: claudeIcon
+    icon: claudeIcon,
+    labelSide: 'left'
   },
   {
     className: 'im-cta-photo-3',
     href: 'https://cursor.com',
     label: 'Cursor',
-    icon: cursorIcon
+    icon: cursorIcon,
+    labelSide: 'right'
   },
   {
     className: 'im-cta-photo-4',
     href: 'https://devin.ai',
     label: 'Devin',
-    icon: devinIcon
+    icon: devinIcon,
+    labelSide: 'left'
   },
   {
     className: 'im-cta-photo-5',
     href: 'https://gemini.google.com',
     label: 'Gemini',
-    icon: geminiIcon
+    icon: geminiIcon,
+    labelSide: 'right'
   },
   {
     className: 'im-cta-photo-6',
     href: 'https://grok.com',
     label: 'Grok',
-    icon: grokIcon
+    icon: grokIcon,
+    labelSide: 'left'
   }
 ]
 ---
@@ -53,12 +59,13 @@ const cards = [
       {
         cards.map((card) => (
           <button
-            class={`im-cta-photo ${card.className}`}
+            class={`im-cta-photo ${card.className} im-label-${card.labelSide}`}
             type='button'
             data-url={card.href}
             aria-label={`Open ${card.label}`}
           >
             <img src={card.icon} alt='' class='im-cta-icon' loading='lazy' />
+            <span class='im-cta-label'>{card.label}</span>
           </button>
         ))
       }
@@ -70,6 +77,7 @@ const cards = [
         aria-label='Open Ludus'
       >
         <img src={ludusIcon} alt='' class='im-cta-icon' loading='lazy' />
+        <span class='im-cta-label'>Ludus</span>
       </button>
     </div>
   </div>
@@ -112,6 +120,7 @@ const cards = [
     position: absolute;
     display: grid;
     place-items: center;
+    overflow: visible;
     border: 1px solid hsl(var(--border) / 0.76);
     background: rgb(255 255 255 / 0.9);
     color: #050506;
@@ -143,6 +152,75 @@ const cards = [
     object-fit: contain;
     border-radius: 999px;
     pointer-events: none;
+  }
+
+  .im-cta-label {
+    position: absolute;
+    top: 50%;
+    z-index: 4;
+    width: max-content;
+    max-width: 8rem;
+    border: 1px solid hsl(var(--border) / 0.72);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.94);
+    padding: 0.32rem 0.68rem;
+    color: #050506;
+    font-size: 0.78rem;
+    font-weight: 500;
+    line-height: 1;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    white-space: nowrap;
+    box-shadow: 0 10px 22px rgb(0 0 0 / 0.1);
+    transition:
+      opacity 0.22s ease,
+      visibility 0s linear 0.22s,
+      transform 0.34s cubic-bezier(0.2, 0.9, 0.2, 1.25);
+  }
+
+  .im-label-right .im-cta-label {
+    left: calc(100% + 0.42rem);
+    transform: translate(-0.9rem, -50%) scale(0.86);
+    transform-origin: left center;
+  }
+
+  .im-label-left .im-cta-label {
+    right: calc(100% + 0.42rem);
+    transform: translate(0.9rem, -50%) scale(0.86);
+    transform-origin: right center;
+  }
+
+  .im-center-card .im-cta-label {
+    top: auto;
+    bottom: calc(100% + 0.42rem);
+    left: 50%;
+    transform: translate(-50%, 0.9rem) scale(0.86);
+    transform-origin: center bottom;
+  }
+
+  .im-cta-photo.is-hovered .im-cta-label,
+  .im-center-card.is-hovered .im-cta-label,
+  .im-cta-photo:focus-visible .im-cta-label,
+  .im-center-card:focus-visible .im-cta-label {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  .im-label-right.is-hovered .im-cta-label,
+  .im-label-right:focus-visible .im-cta-label {
+    transform: translate(0.18rem, -50%) scale(1);
+  }
+
+  .im-label-left.is-hovered .im-cta-label,
+  .im-label-left:focus-visible .im-cta-label {
+    transform: translate(-0.18rem, -50%) scale(1);
+  }
+
+  .im-center-card.is-hovered .im-cta-label,
+  .im-center-card:focus-visible .im-cta-label {
+    transform: translate(-50%, -0.18rem) scale(1);
   }
 
   .im-cta-photo.is-hovered,
@@ -279,6 +357,12 @@ const cards = [
       width: 68px;
       height: 68px;
       margin: -34px 0 0 -34px;
+    }
+
+    .im-cta-label {
+      max-width: 7rem;
+      padding: 0.28rem 0.58rem;
+      font-size: 0.72rem;
     }
   }
 </style>
