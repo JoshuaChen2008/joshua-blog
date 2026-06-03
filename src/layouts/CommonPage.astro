@@ -10,6 +10,7 @@ interface Props {
   headings?: MarkdownHeading[]
   view?: boolean
   comment?: boolean
+  hideSidebar?: boolean
 }
 
 const { title, headings, view, comment: enableComment, ...props } = Astro.props

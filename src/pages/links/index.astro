@@ -7,21 +7,17 @@ import PageLayout from '@/layouts/CommonPage.astro'
 import FriendList from '@/components/links/FriendList.astro'
 import LudusCta from '@/components/links/LudusCta.astro'
 
-const headings = [
-  { depth: 2, slug: 'common-links', text: 'Common Links' },
-  { depth: 2, slug: 'special-links', text: 'Special Links' },
-  { depth: 2, slug: 'apply-links', text: 'Apply Links' }
-]
+
 
 const { friends } = links
 const linksConf = config.integ.links
 const linkEditPage = 'https://github.com/cworld1/astro-theme-pure/blob/main/public/links.json'
 ---
 
-<PageLayout title='Links'>
+<PageLayout title='Links' hideSidebar={true}>
   <p>They're my friends.</p>
   <LudusCta />
-</PageLayout>
+
 {
   /*<h2 id='common-links'>Common Links</h2>
 
