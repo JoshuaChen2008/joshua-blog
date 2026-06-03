@@ -3,7 +3,6 @@ import avatarIcon from '@/assets/avatar.png?url'
 import devinIcon from '@/assets/tools/anti.svg?url'
 import grokIcon from '@/assets/tools/arcticons--openai-chatgpt.svg?url'
 import codexIcon from '@/assets/tools/codex.svg?url'
-import ludusIcon from '@/assets/tools/ludus.svg?url'
 import geminiIcon from '@/assets/tools/ri--gemini-fill.svg?url'
 import claudeIcon from '@/assets/tools/simple-icons--claude.svg?url'
 import cursorIcon from '@/assets/tools/vscode1.svg?url'
@@ -92,13 +91,52 @@ const cards = [
   }
 
   .im-bottom-cta {
+    --im-section-gradient: radial-gradient(
+      circle at 50% 50%,
+      rgb(186 230 253 / 0.68) 0%,
+      rgb(224 242 254 / 0.42) 22%,
+      rgb(240 249 255 / 0.22) 42%,
+      hsl(var(--background) / 1) 74%
+    );
+    --im-card-bg: rgb(255 255 255 / 0.88);
+    --im-card-bg-hover: rgb(255 255 255 / 0.98);
+    --im-card-border: hsl(var(--border) / 0.76);
+    --im-card-border-hover: hsl(var(--foreground) / 0.2);
+    --im-card-shadow: rgb(15 23 42 / 0.14);
+    --im-card-shadow-hover: rgb(15 23 42 / 0.2);
+    --im-label-bg: rgb(255 255 255 / 0.94);
+    --im-label-color: #050506;
+    --im-label-border: hsl(var(--border) / 0.72);
+    --im-label-shadow: rgb(15 23 42 / 0.12);
     position: relative;
     z-index: 2;
     min-height: 560px;
     overflow: hidden;
-    background: transparent;
+    background: var(--im-section-gradient);
     padding-top: 72px;
     padding-bottom: 96px;
+    border-radius: 0.75rem;
+    transition: background 0.35s ease;
+  }
+
+  :global(.dark) .im-bottom-cta {
+    --im-section-gradient: radial-gradient(
+      circle at 50% 50%,
+      rgb(255 255 255 / 0.18) 0%,
+      rgb(125 211 252 / 0.13) 18%,
+      rgb(14 40 62 / 0.52) 44%,
+      hsl(var(--background) / 1) 78%
+    );
+    --im-card-bg: rgb(24 24 28 / 0.72);
+    --im-card-bg-hover: rgb(38 38 44 / 0.88);
+    --im-card-border: rgb(255 255 255 / 0.14);
+    --im-card-border-hover: rgb(255 255 255 / 0.28);
+    --im-card-shadow: rgb(0 0 0 / 0.34);
+    --im-card-shadow-hover: rgb(0 0 0 / 0.5);
+    --im-label-bg: rgb(20 20 24 / 0.9);
+    --im-label-color: hsl(var(--foreground) / 0.96);
+    --im-label-border: rgb(255 255 255 / 0.16);
+    --im-label-shadow: rgb(0 0 0 / 0.38);
   }
 
   .im-bottom-cta-wrap {
@@ -122,14 +160,14 @@ const cards = [
     display: grid;
     place-items: center;
     overflow: visible;
-    border: 1px solid hsl(var(--border) / 0.76);
+    border: 1px solid var(--im-card-border);
     /*1px                      边框粗细
     solid                    实线
     hsl(var(--border) / .76) 颜色和透明度，.76 越大越明显*/
-    background: rgb(255 255 255 / 0.9);
+    background-color: var(--im-card-bg);
     color: #050506;
     cursor: pointer;
-    filter: drop-shadow(0 10px 14px rgb(0 0 0 / 0.12));
+    filter: drop-shadow(0 10px 14px var(--im-card-shadow));
     transition:
       transform 0.18s ease-out,
       border-radius 0.35s ease,
@@ -155,6 +193,11 @@ const cards = [
     object-fit: cover;
     border-radius: 999px;
     pointer-events: none;
+    transition: filter 0.35s ease;
+  }
+
+  :global(.dark) .im-cta-photo .im-cta-icon {
+    filter: brightness(0) invert(1);
   }
 
   .im-cta-label {
@@ -163,11 +206,11 @@ const cards = [
     z-index: 4;
     width: max-content;
     max-width: 8rem;
-    border: 1px solid hsl(var(--border) / 0.72);
+    border: 1px solid var(--im-label-border);
     border-radius: 999px;
-    background: rgb(255 255 255 / 0.94);
+    background-color: var(--im-label-bg);
     padding: 0.32rem 0.68rem;
-    color: #050506;
+    color: var(--im-label-color);
     font-size: 0.78rem;
     font-weight: 500;
     line-height: 1;
@@ -175,7 +218,7 @@ const cards = [
     pointer-events: none;
     visibility: hidden;
     white-space: nowrap;
-    box-shadow: 0 10px 22px rgb(0 0 0 / 0.1);
+    box-shadow: 0 10px 22px var(--im-label-shadow);
     transition:
       opacity 0.22s ease,
       visibility 0s linear 0.22s,
@@ -228,9 +271,9 @@ const cards = [
 
   .im-cta-photo.is-hovered,
   .im-center-card.is-hovered {
-    border-color: hsl(var(--foreground) / 0.2);
-    background: #fff;
-    filter: drop-shadow(0 14px 22px rgb(0 0 0 / 0.18));
+    border-color: var(--im-card-border-hover);
+    background-color: var(--im-card-bg-hover);
+    filter: drop-shadow(0 14px 22px var(--im-card-shadow-hover));
   }
 
   .im-cta-photo.is-hovered {
@@ -312,7 +355,7 @@ const cards = [
 
   .im-center-card.is-hovered {
     border-radius: 36px;
-    filter: drop-shadow(0 16px 26px rgb(0 0 0 / 0.18));
+    filter: drop-shadow(0 16px 26px var(--im-card-shadow-hover));
   }
 
   @media (max-width: 768px) {
