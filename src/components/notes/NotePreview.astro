@@ -1,0 +1,97 @@
+---
+import type { CollectionEntry } from 'astro:content'
+import { statusColors, statusLabels, typeColors, typeLabels } from '@/lib/noteMeta'
+
+interface Props {
+  entry: CollectionEntry<'note'>
+}
+
+const { entry } = Astro.props
+---
+
+<li class='note-preview'>
+  <a
+    href={`/note/${entry.id}`}
+    class='group
+    block
+    rounded-xl
+    border
+    border-border
+    bg-card
+    px-5
+    py-5
+    transition-colors
+    ease-in-out
+    hover:border-foreground
+    20
+    hover:bg-muted
+    hover:text-primary
+    hover:shadow-sm'
+    data-astro-prefetch
+  >
+    <div class='flex items-start justify-between gap-4'>
+      <div class='min-w-0 flex-1 space-y-2'>
+        <h3
+          class='text-lg font-medium leading-tight group-hover:text-foregroundtext-lg font-medium leading-tight transition-colors group-hover:text-primary'
+        >
+          {entry.data.title}
+        </h3>
+        {
+          entry.data.description && (
+            <p class='text-sm leading-6 text-muted-foreground'>{entry.data.description}</p>
+          )
+        }
+
+        <div class='flex flex-wrap items-center gap-x-2 gap-y-2 text-xs text-muted-foreground'>
+          <span class={`rounded-md px-2 py-0.5 font-medium ${typeColors[entry.data.type]}`}>
+            {typeLabels[entry.data.type] || entry.data.type}
+          </span>
+          <span>·</span>
+          <time datetime={entry.data.date.toISOString()}>
+            {
+              entry.data.date.toLocaleDateString('zh-CN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+              })
+            }
+          </time>
+          {
+            entry.data.updatedDate && (
+              <span>
+                · 更新于{' '}
+                {entry.data.updatedDate.toLocaleDateString('zh-CN', {
+                  month: 'short',
+                  day: 'numeric'
+                })}
+              </span>
+            )
+          }
+          {
+            entry.data.tags.length > 0 && (
+              <>
+                <span>·</span>
+                <div class='flex flex-wrap gap-1.5'>
+                  {entry.data.tags.map((tag: string) => (
+                    <span class='rounded-md bg-muted px-2 py-0.5'>{tag}</span>
+                  ))}
+                </div>
+              </>
+            )
+          }
+          <span>·</span>
+          <span>
+            <span class='waline-pageview-readonly' data-path={`/note/${entry.id}`}> 0 </span>{' '}
+            views
+          </span>
+        </div>
+      </div>
+
+      <span
+        class={`mt-0.5 shrink-0 rounded-md px-2 py-1 text-xs font-medium ${statusColors[entry.data.status]}`}
+      >
+        {statusLabels[entry.data.status]}
+      </span>
+    </div>
+  </a>
+</li>
