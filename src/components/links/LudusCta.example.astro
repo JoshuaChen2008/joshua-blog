@@ -23,13 +23,14 @@
   - ?url 表示让 Astro/Vite 返回一个可以给 <img src="..."> 使用的图片地址。
   - 下面这些 SVG 都是当前项目里已经存在的素材。
 */
+import devinIcon from '@/assets/tools/anti.svg?url'
+import grokIcon from '@/assets/tools/arcticons--openai-chatgpt.svg?url'
+import avatarIcon from '@/assets/avatar.png?url'
 import codexIcon from '@/assets/tools/codex.svg?url'
+import ludusIcon from '@/assets/tools/ludus.svg?url'
+import geminiIcon from '@/assets/tools/ri--gemini-fill.svg?url'
 import claudeIcon from '@/assets/tools/simple-icons--claude.svg?url'
 import cursorIcon from '@/assets/tools/vscode1.svg?url'
-import devinIcon from '@/assets/tools/anti.svg?url'
-import geminiIcon from '@/assets/tools/ri--gemini-fill.svg?url'
-import grokIcon from '@/assets/tools/arcticons--openai-chatgpt.svg?url'
-import ludusIcon from '@/assets/tools/ludus.svg?url'
 
 /*
   PNG 示例：
@@ -312,8 +313,7 @@ const cards = [
     width: 96px;
     height: 96px;
     border-radius: 22px;
-    transform:
-      translate(
+    transform: translate(
         calc(var(--example-mouse-x) * var(--example-px, 30px)),
         calc(var(--example-mouse-y) * var(--example-py, 30px))
       )
@@ -725,7 +725,8 @@ const cards = [
       */
       card.addEventListener('mouseenter', () => {
         const transform = getComputedStyle(card).transform
-        const matrix = transform === 'none' ? new DOMMatrixReadOnly() : new DOMMatrixReadOnly(transform)
+        const matrix =
+          transform === 'none' ? new DOMMatrixReadOnly() : new DOMMatrixReadOnly(transform)
         const angle = Math.atan2(matrix.m21, matrix.m11) * (180 / Math.PI)
 
         card.style.transform = `translate(${matrix.m41.toFixed(1)}px, ${matrix.m42.toFixed(
