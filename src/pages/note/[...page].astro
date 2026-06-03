@@ -149,12 +149,13 @@ const paginationProps = {
                 {uniqueStatuses.map((status) => (
                   <li class='flex items-center justify-between gap-3'>
                     <span class='flex items-center gap-2'>
-                      <span
-                        class={`rounded-md px-2 py-0.5 text-xs font-medium        
+                      <a
+                        href={`/note/status/${status}`}
+                        class={`rounded-md px-2 py-0.5 text-xs font-medium transition hover:opacity-80        
                       ${statusColors[status] || 'bg-gray-100 text-gray-600 dark:bg-gray-800/30 dark:text-gray-400'}`}
                       >
                         {statusLabels[status] || status}
-                      </span>{' '}
+                      </a>{' '}
                     </span>
                     <span class='text-xs text-muted-foreground'>{statusCounts[status] || 0}</span>
                   </li>

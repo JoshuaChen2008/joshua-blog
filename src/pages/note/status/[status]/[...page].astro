@@ -1,0 +1,108 @@
+---
+/**
+ * Note Status Filter Page with Pagination
+ * Shows note entries filtered by status.
+ */
+import type { GetStaticPaths, Page } from 'astro'
+import type { CollectionEntry } from 'astro:content'
+
+import { getCollection } from 'astro:content'
+import { Paginator } from 'astro-pure/components/pages'
+import { Button, Icon } from 'astro-pure/user'
+import NotePreview from '@/components/notes/NotePreview.astro'
+import PageLayout from '@/layouts/BaseLayout.astro'
+import { statusColors, statusLabels } from '@/lib/noteMeta'
+
+export const prerender = true
+
+export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
+  const allNotes = (await getCollection('note')).filter((entry) => !entry.data.draft)
+  const uniqueStatuses = [...new Set(allNotes.map((entry) => entry.data.status))]
+
+  return uniqueStatuses.flatMap((status) => {
+    const filteredEntries = allNotes
+      .filter((entry) => entry.data.status === status)
+      .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+
+    return paginate(filteredEntries, {
+      params: { status },
+      pageSize: 20
+    })
+  })
+}
+
+interface Props {
+  page: Page<CollectionEntry<'note'>>
+}
+
+const { page } = Astro.props as unknown as Props
+const { status = '' } = Astro.params
+const statusLabel = statusLabels[status] || status
+
+const meta = {
+  title: `Note Status: ${statusLabel}`,
+  description: `Notes marked as ${statusLabel}`
+}
+
+const paginationProps = {
+  ...(page.url.prev && {
+    prevUrl: {
+      text: '← 上一页',
+      url: page.url.prev
+    }
+  }),
+  ...(page.url.next && {
+    nextUrl: {
+      text: '下一页 →',
+      url: page.url.next
+    }
+  })
+}
+---
+
+<PageLayout {meta}>
+  <Button title='Back' href='/note' variant='back' />
+
+  <main class='mt-6 lg:mt-10'>
+    <div id='content-header' class='animate'>
+      <div class='mb-3 flex items-center gap-3'>
+        <Icon name='list' class='text-muted-foreground' />
+        <h1 class='text-3xl font-medium'>
+          <span
+            class={`rounded-md px-2 py-1 text-base font-medium ${statusColors[status] || 'bg-gray-100 text-gray-600 dark:bg-gray-800/30 dark:text-gray-400'}`}
+          >
+            {statusLabel}
+          </span>
+        </h1>
+      </div>
+      <p class='text-muted-foreground'>
+        {page.total} {page.total === 1 ? 'note' : 'notes'} with this status
+      </p>
+    </div>
+
+    <section id='content' class='animate mt-10' aria-label='Note entries'>
+      <div class='mb-3 flex flex-col justify-between text-sm text-muted-foreground sm:mb-5 sm:flex-row'>
+        <span>
+          Page {page.start + 1} - Showing {page.end + 1} of {page.total} posts
+        </span>
+        {page.lastPage > 1 && (
+          <span>
+            第 {page.currentPage} / {page.lastPage} 页
+          </span>
+        )}
+      </div>
+
+      <ul class='flex flex-col gap-y-4 text-start'>
+        {page.data.map((entry) => (
+          <NotePreview {entry} />
+        ))}
+      </ul>
+
+      {page.lastPage > 1 && (
+        <div class='mt-8'>
+          <Paginator {...paginationProps} />
+        </div>
+      )}
+    </section>
+  </main>
+</PageLayout>
