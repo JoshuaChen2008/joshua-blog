@@ -112,10 +112,34 @@ const cards = [
     z-index: 2;
     min-height: 560px;
     overflow: hidden;
-    background: var(--im-section-gradient);
+    isolation: isolate;
+    background: transparent;
     padding-top: 72px;
     padding-bottom: 96px;
-    border-radius: 0.75rem;
+    border-radius: 0;
+  }
+
+  .im-bottom-cta::before {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    content: '';
+    background: var(--im-section-gradient);
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      #000 18%,
+      #000 82%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      #000 18%,
+      #000 82%,
+      transparent 100%
+    );
     transition: background 0.35s ease;
   }
 
@@ -141,6 +165,7 @@ const cards = [
 
   .im-bottom-cta-wrap {
     position: relative;
+    z-index: 1;
     min-height: 392px;
   }
 
