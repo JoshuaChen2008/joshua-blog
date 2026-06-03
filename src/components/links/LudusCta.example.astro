@@ -1,0 +1,751 @@
+---
+/*
+  LudusCta.example.astro
+
+  这个文件是模板示例，不是当前页面正在使用的正式组件。
+  正式组件是同目录下的 LudusCta.astro。
+
+  你以后想改名字、图片、链接、卡片数量、卡片位置，可以先看这个模板。
+  如果要真正生效，把这里的写法复制到 LudusCta.astro，或直接改 LudusCta.astro。
+*/
+
+/*
+  1. 导入图片素材
+
+  SVG 推荐写法：
+  import iconName from '@/assets/tools/xxx.svg?url'
+
+  PNG 推荐写法：
+  import iconName from '@/assets/tools/xxx.png?url'
+
+  注意：
+  - 图片要放在 src/assets/tools/ 下面。
+  - ?url 表示让 Astro/Vite 返回一个可以给 <img src="..."> 使用的图片地址。
+  - 下面这些 SVG 都是当前项目里已经存在的素材。
+*/
+import codexIcon from '@/assets/tools/codex.svg?url'
+import claudeIcon from '@/assets/tools/simple-icons--claude.svg?url'
+import cursorIcon from '@/assets/tools/vscode1.svg?url'
+import devinIcon from '@/assets/tools/anti.svg?url'
+import geminiIcon from '@/assets/tools/ri--gemini-fill.svg?url'
+import grokIcon from '@/assets/tools/arcticons--openai-chatgpt.svg?url'
+import ludusIcon from '@/assets/tools/ludus.svg?url'
+
+/*
+  PNG 示例：
+  假设你把图片放到 src/assets/tools/my-avatar.png，
+  就可以取消下面这一行注释，然后在 cards 里写 icon: myAvatarIcon。
+
+  import myAvatarIcon from '@/assets/tools/my-avatar.png?url'
+*/
+
+/*
+  2. 配置外圈卡片
+
+  每一个对象就是一个小方块卡片。
+
+  className:
+    对应下面 CSS 里的 .example-cta-photo-1 / 2 / 3 ...
+    如果新增第 7 个卡片，就写 example-cta-photo-7，
+    然后在 CSS 里新增 .example-cta-photo-7 的位置。
+
+  href:
+    点击卡片时打开的链接。
+
+  label:
+    鼠标 hover 时，从卡片边缘弹出的名字。
+
+  icon:
+    这张卡片显示的图片变量，也就是上面 import 进来的图片。
+
+  labelSide:
+    名字从哪一侧弹出。
+    - 'right' 表示名字从卡片右边缘向外弹出。
+    - 'left' 表示名字从卡片左边缘向外弹出。
+*/
+const cards = [
+  {
+    className: 'example-cta-photo-1',
+    href: 'https://openai.com/index/codex/',
+    label: 'Codex',
+    icon: codexIcon,
+    labelSide: 'right'
+  },
+  {
+    className: 'example-cta-photo-2',
+    href: 'https://claude.ai',
+    label: 'Claude',
+    icon: claudeIcon,
+    labelSide: 'left'
+  },
+  {
+    className: 'example-cta-photo-3',
+    href: 'https://cursor.com',
+    label: 'Cursor',
+    icon: cursorIcon,
+    labelSide: 'right'
+  },
+  {
+    className: 'example-cta-photo-4',
+    href: 'https://devin.ai',
+    label: 'Devin',
+    icon: devinIcon,
+    labelSide: 'left'
+  },
+  {
+    className: 'example-cta-photo-5',
+    href: 'https://gemini.google.com',
+    label: 'Gemini',
+    icon: geminiIcon,
+    labelSide: 'right'
+  },
+  {
+    className: 'example-cta-photo-6',
+    href: 'https://grok.com',
+    label: 'Grok',
+    icon: grokIcon,
+    labelSide: 'left'
+  }
+
+  /*
+    3. 新增第 7 个小方块示例
+
+    第一步：在上面 import 新图片，例如：
+    import myAvatarIcon from '@/assets/tools/my-avatar.png?url'
+
+    第二步：取消下面这段注释。
+
+    第三步：在 CSS 里新增 .example-cta-photo-7 和移动端位置。
+
+    ,
+    {
+      className: 'example-cta-photo-7',
+      href: 'https://example.com',
+      label: 'My Tool',
+      icon: myAvatarIcon,
+      labelSide: 'right'
+    }
+  */
+]
+---
+
+<!--
+  4. 组件 HTML 结构
+
+  section:
+    整个 CTA 组件根节点。
+
+  example-bottom-cta-wrap:
+    提供一个固定高度的相对定位容器。
+
+  example-bottom-cta-media:
+    所有图标卡片的活动区域。
+    鼠标移动时，JS 会把 --example-mouse-x 和 --example-mouse-y 写到这里。
+
+  button.example-cta-photo:
+    每一个外圈小方块。
+    data-url 用于点击后打开链接。
+
+  span.example-cta-label:
+    hover 时从边缘外弹出的名字。
+-->
+<section id='ludus-cta-example' class='example-section example-bottom-cta not-prose'>
+  <div class='example-bottom-cta-wrap'>
+    <div class='example-bottom-cta-media'>
+      {
+        cards.map((card) => (
+          <button
+            class={`example-cta-photo ${card.className} example-label-${card.labelSide}`}
+            type='button'
+            data-url={card.href}
+            aria-label={`Open ${card.label}`}
+          >
+            <img src={card.icon} alt='' class='example-cta-icon' loading='lazy' />
+            <span class='example-cta-label'>{card.label}</span>
+          </button>
+        ))
+      }
+
+      <!--
+        5. 中心卡片
+
+        如果想改中心图标：
+        - 改上面的 import ludusIcon from ...
+        - 或把 src={ludusIcon} 换成其他 icon 变量。
+
+        如果想改中心名字：
+        - 改 <span> 里的 Ludus。
+
+        如果想改中心点击链接：
+        - 改 data-url。
+      -->
+      <button
+        class='example-center-card'
+        type='button'
+        data-url='https://ludus.my'
+        aria-label='Open Ludus'
+      >
+        <img src={ludusIcon} alt='' class='example-cta-icon' loading='lazy' />
+        <span class='example-cta-label'>Ludus</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<style>
+  /*
+    6. 整个 CTA 的外层尺寸
+
+    width: 100%:
+      让 CTA 横向占满父容器。
+
+    margin: 1.5rem auto 0:
+      顶部留一点距离，并保持自身居中。
+
+    padding:
+      控制整个动效区域上下留白。
+  */
+  .example-section {
+    width: 100%;
+    margin: 1.5rem auto 0;
+    padding: 64px 0 56px;
+  }
+
+  /*
+    7. CTA 面板区域
+
+    background: transparent:
+      背景透明，和页面背景融在一起。
+
+    min-height:
+      控制整个动画区域高度。
+      想让图标上下活动空间更大，就增大这个值。
+  */
+  .example-bottom-cta {
+    position: relative;
+    z-index: 2;
+    min-height: 560px;
+    overflow: hidden;
+    background: transparent;
+    padding-top: 72px;
+    padding-bottom: 96px;
+  }
+
+  /*
+    8. 内部定位容器
+
+    min-height:
+      控制图标卡片定位所依据的高度。
+  */
+  .example-bottom-cta-wrap {
+    position: relative;
+    min-height: 392px;
+  }
+
+  /*
+    9. 图标活动层
+
+    max-width: 58rem:
+      控制图标阵列最大横向活动范围。
+      想让图标更分散，可以改成 64rem、72rem。
+
+    margin-inline: auto:
+      让图标阵列在页面中居中。
+
+    --example-mouse-x / --example-mouse-y:
+      JS 会更新这两个变量，CSS 再用它们做视差移动。
+  */
+  .example-bottom-cta-media {
+    --example-mouse-x: 0;
+    --example-mouse-y: 0;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    max-width: 58rem;
+    margin-inline: auto;
+  }
+
+  /*
+    10. 外圈卡片和中心卡片的通用样式
+
+    overflow: visible:
+      很重要。名字标签要从方块边缘外弹出，所以不能被卡片裁掉。
+
+    filter:
+      控制阴影。
+
+    transition:
+      控制 hover 时圆角、阴影、变形的过渡。
+  */
+  .example-cta-photo,
+  .example-center-card {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    overflow: visible;
+    border: 1px solid hsl(var(--border) / 0.76);
+    background: rgb(255 255 255 / 0.9);
+    color: #050506;
+    cursor: pointer;
+    filter: drop-shadow(0 10px 14px rgb(0 0 0 / 0.12));
+    transition:
+      transform 0.18s ease-out,
+      border-radius 0.35s ease,
+      filter 0.35s ease,
+      border-color 0.35s ease,
+      background-color 0.35s ease;
+  }
+
+  /*
+    11. 外圈卡片基础尺寸
+
+    width / height:
+      默认小方块大小。
+
+    border-radius:
+      方块圆角。
+
+    transform:
+      使用鼠标变量和每个卡片自己的 --example-px / --example-py 做视差移动。
+  */
+  .example-cta-photo {
+    width: 96px;
+    height: 96px;
+    border-radius: 22px;
+    transform:
+      translate(
+        calc(var(--example-mouse-x) * var(--example-px, 30px)),
+        calc(var(--example-mouse-y) * var(--example-py, 30px))
+      )
+      rotate(var(--example-rot, 0deg));
+  }
+
+  /*
+    12. 图片样式
+
+    object-fit: contain:
+      保持图片完整显示，不裁切。
+
+    border-radius:
+      如果你的 PNG 是方形图，不想变圆，可以改成 0。
+  */
+  .example-cta-icon {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
+    border-radius: 999px;
+    pointer-events: none;
+  }
+
+  /*
+    13. hover 弹出的名字标签
+
+    默认状态：
+      opacity: 0;
+      visibility: hidden;
+      也就是鼠标浮上去之前完全隐藏。
+
+    position: absolute:
+      标签相对于卡片定位。
+
+    pointer-events: none:
+      标签不会抢鼠标事件，避免 hover 抖动。
+  */
+  .example-cta-label {
+    position: absolute;
+    top: 50%;
+    z-index: 4;
+    width: max-content;
+    max-width: 8rem;
+    border: 1px solid hsl(var(--border) / 0.72);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.94);
+    padding: 0.32rem 0.68rem;
+    color: #050506;
+    font-size: 0.78rem;
+    font-weight: 500;
+    line-height: 1;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    white-space: nowrap;
+    box-shadow: 0 10px 22px rgb(0 0 0 / 0.1);
+    transition:
+      opacity 0.22s ease,
+      visibility 0s linear 0.22s,
+      transform 0.34s cubic-bezier(0.2, 0.9, 0.2, 1.25);
+  }
+
+  /*
+    14. 名字从右侧弹出
+
+    left: calc(100% + 0.42rem):
+      标签默认就在方块右边缘外面。
+
+    transform: translate(-0.9rem, -50%) scale(0.86):
+      hover 前稍微缩回边缘附近并变小。
+  */
+  .example-label-right .example-cta-label {
+    left: calc(100% + 0.42rem);
+    transform: translate(-0.9rem, -50%) scale(0.86);
+    transform-origin: left center;
+  }
+
+  /*
+    15. 名字从左侧弹出
+  */
+  .example-label-left .example-cta-label {
+    right: calc(100% + 0.42rem);
+    transform: translate(0.9rem, -50%) scale(0.86);
+    transform-origin: right center;
+  }
+
+  /*
+    16. 中心 Ludus 名字从上方弹出
+  */
+  .example-center-card .example-cta-label {
+    top: auto;
+    bottom: calc(100% + 0.42rem);
+    left: 50%;
+    transform: translate(-50%, 0.9rem) scale(0.86);
+    transform-origin: center bottom;
+  }
+
+  /*
+    17. hover 或键盘 focus 时显示名字
+
+    .is-hovered:
+      JS 在 mouseenter 时给卡片加上这个 class。
+
+    :focus-visible:
+      键盘 Tab 到卡片时也能显示名字。
+  */
+  .example-cta-photo.is-hovered .example-cta-label,
+  .example-center-card.is-hovered .example-cta-label,
+  .example-cta-photo:focus-visible .example-cta-label,
+  .example-center-card:focus-visible .example-cta-label {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  /*
+    18. hover 后名字真正向外弹出
+
+    right 类型：
+      往右外侧弹。
+
+    left 类型：
+      往左外侧弹。
+
+    center：
+      往上弹。
+  */
+  .example-label-right.is-hovered .example-cta-label,
+  .example-label-right:focus-visible .example-cta-label {
+    transform: translate(0.18rem, -50%) scale(1);
+  }
+
+  .example-label-left.is-hovered .example-cta-label,
+  .example-label-left:focus-visible .example-cta-label {
+    transform: translate(-0.18rem, -50%) scale(1);
+  }
+
+  .example-center-card.is-hovered .example-cta-label,
+  .example-center-card:focus-visible .example-cta-label {
+    transform: translate(-50%, -0.18rem) scale(1);
+  }
+
+  /*
+    19. 卡片 hover 后的视觉变化
+  */
+  .example-cta-photo.is-hovered,
+  .example-center-card.is-hovered {
+    border-color: hsl(var(--foreground) / 0.2);
+    background: #fff;
+    filter: drop-shadow(0 14px 22px rgb(0 0 0 / 0.18));
+  }
+
+  .example-cta-photo.is-hovered {
+    border-radius: 34px;
+  }
+
+  /*
+    20. 每个外圈小方块的位置
+
+    top / left / right / bottom:
+      控制卡片在活动层中的位置。
+
+    width / height:
+      可以单独覆盖某个卡片大小。
+
+    --example-px / --example-py:
+      控制鼠标视差移动幅度。
+      数值越大，鼠标移动时飘得越明显。
+
+    --example-rot:
+      默认旋转角度。
+  */
+  .example-cta-photo-1 {
+    --example-px: -60px;
+    --example-py: 40px;
+    --example-rot: 7deg;
+    top: 6%;
+    left: 16%;
+  }
+
+  .example-cta-photo-2 {
+    --example-px: 80px;
+    --example-py: -40px;
+    --example-rot: -8deg;
+    top: 7%;
+    right: 16%;
+  }
+
+  .example-cta-photo-3 {
+    --example-px: -35px;
+    --example-py: -50px;
+    --example-rot: -5deg;
+    top: 42%;
+    left: 8%;
+    width: 78px;
+    height: 78px;
+  }
+
+  .example-cta-photo-4 {
+    --example-px: 50px;
+    --example-py: 42px;
+    --example-rot: 7deg;
+    top: 48%;
+    right: 8%;
+    width: 78px;
+    height: 78px;
+  }
+
+  .example-cta-photo-5 {
+    --example-px: 62px;
+    --example-py: -62px;
+    --example-rot: -11deg;
+    left: 22%;
+    bottom: -10%;
+    width: 112px;
+    height: 112px;
+  }
+
+  .example-cta-photo-6 {
+    --example-px: -55px;
+    --example-py: 45px;
+    --example-rot: 12deg;
+    right: 22%;
+    bottom: -14%;
+    width: 112px;
+    height: 112px;
+  }
+
+  /*
+    21. 新增第 7 个小方块时，CSS 可以这样写：
+
+    .example-cta-photo-7 {
+      --example-px: 45px;
+      --example-py: -35px;
+      --example-rot: 6deg;
+      top: 24%;
+      left: 38%;
+      width: 84px;
+      height: 84px;
+    }
+  */
+
+  /*
+    22. 中心卡片位置
+
+    top: 50%; left: 50%;
+      放在活动区域正中心。
+
+    margin:
+      用负 margin 抵消自身尺寸，使中心点对齐。
+  */
+  .example-center-card {
+    top: 50%;
+    left: 50%;
+    z-index: 3;
+    width: 88px;
+    height: 88px;
+    margin: -44px 0 0 -44px;
+    border-radius: 24px;
+    transform: translate(calc(var(--example-mouse-x) * 6px), calc(var(--example-mouse-y) * 6px));
+    transition:
+      transform 0.25s ease-out,
+      border-radius 0.35s ease,
+      filter 0.35s ease,
+      border-color 0.35s ease,
+      background-color 0.35s ease;
+  }
+
+  .example-center-card.is-hovered {
+    border-radius: 36px;
+    filter: drop-shadow(0 16px 26px rgb(0 0 0 / 0.18));
+  }
+
+  /*
+    23. 移动端位置
+
+    小屏幕宽度有限，所以把左右卡片往外推一点，
+    让画面仍然有分散感。
+
+    如果新增了 .example-cta-photo-7，
+    也建议在这里给它写一份移动端位置。
+  */
+  @media (max-width: 768px) {
+    .example-section {
+      width: 100%;
+      padding: 56px 0;
+    }
+
+    .example-bottom-cta {
+      min-height: 520px;
+      padding-bottom: 80px;
+    }
+
+    .example-cta-photo-1 {
+      top: 30%;
+      left: -42px;
+    }
+
+    .example-cta-photo-2 {
+      top: 30%;
+      right: -42px;
+    }
+
+    .example-cta-photo-3 {
+      top: 3%;
+      left: -10px;
+    }
+
+    .example-cta-photo-4 {
+      top: 4%;
+      right: -12px;
+    }
+
+    .example-cta-photo-5 {
+      left: -12px;
+      bottom: -18px;
+    }
+
+    .example-cta-photo-6 {
+      right: -12px;
+      bottom: -18px;
+    }
+
+    .example-center-card {
+      width: 68px;
+      height: 68px;
+      margin: -34px 0 0 -34px;
+    }
+
+    .example-cta-label {
+      max-width: 7rem;
+      padding: 0.28rem 0.58rem;
+      font-size: 0.72rem;
+    }
+  }
+</style>
+
+<script is:inline>
+  ;(() => {
+    /*
+      24. 找到当前组件根节点和活动层
+
+      如果你把 id 改掉，下面的 getElementById 也要一起改。
+    */
+    const section = document.getElementById('ludus-cta-example')
+    const media = section?.querySelector('.example-bottom-cta-media')
+
+    /*
+      如果页面上没有这个组件，就直接停止脚本，避免报错。
+    */
+    if (!section || !media) return
+
+    /*
+      25. 鼠标移动视差
+
+      mousemove 时计算鼠标在组件中的相对位置：
+      - 最左边约等于 -1
+      - 中间约等于 0
+      - 最右边约等于 1
+
+      然后写入 CSS 变量：
+      --example-mouse-x
+      --example-mouse-y
+    */
+    section.addEventListener('mousemove', (event) => {
+      const rect = section.getBoundingClientRect()
+      media.style.setProperty(
+        '--example-mouse-x',
+        String(((event.clientX - rect.left) / rect.width) * 2 - 1)
+      )
+      media.style.setProperty(
+        '--example-mouse-y',
+        String(((event.clientY - rect.top) / rect.height) * 2 - 1)
+      )
+    })
+
+    /*
+      26. 鼠标离开整个 CTA 区域后，视差回到中心状态。
+    */
+    section.addEventListener('mouseleave', () => {
+      media.style.setProperty('--example-mouse-x', '0')
+      media.style.setProperty('--example-mouse-y', '0')
+    })
+
+    /*
+      27. 找到所有可以点击和 hover 的卡片。
+    */
+    const allCards = media.querySelectorAll('.example-cta-photo, .example-center-card')
+
+    allCards.forEach((card) => {
+      /*
+        28. 点击卡片打开 data-url。
+
+        想改链接，改上面 cards 里的 href，
+        或改中心卡片 button 上的 data-url。
+      */
+      card.addEventListener('click', () => {
+        const url = card.getAttribute('data-url')
+        if (url) window.open(url, '_blank', 'noopener,noreferrer')
+      })
+
+      /*
+        29. hover 进入卡片：
+
+        - 先读取当前 transform。
+        - 把当前位移和旋转冻结住。
+        - scale(0.92) 让卡片轻微缩一下。
+        - 添加 is-hovered，触发名字标签弹出。
+      */
+      card.addEventListener('mouseenter', () => {
+        const transform = getComputedStyle(card).transform
+        const matrix = transform === 'none' ? new DOMMatrixReadOnly() : new DOMMatrixReadOnly(transform)
+        const angle = Math.atan2(matrix.m21, matrix.m11) * (180 / Math.PI)
+
+        card.style.transform = `translate(${matrix.m41.toFixed(1)}px, ${matrix.m42.toFixed(
+          1
+        )}px) rotate(${angle.toFixed(1)}deg) scale(0.92)`
+        card.classList.add('is-hovered')
+      })
+
+      /*
+        30. hover 离开卡片：
+
+        - 清除内联 transform。
+        - 移除 is-hovered。
+        - CSS 重新接管视差移动。
+        - 名字标签按原路缩回并隐藏。
+      */
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = ''
+        card.classList.remove('is-hovered')
+      })
+    })
+  })()
+</script>
