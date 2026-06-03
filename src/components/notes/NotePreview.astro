@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets'
 import type { CollectionEntry } from 'astro:content'
 import { statusColors, statusLabels, typeColors, typeLabels } from '@/lib/noteMeta'
 
@@ -9,10 +10,19 @@ interface Props {
 const { entry } = Astro.props
 ---
 
-<li class='note-preview'>
+<li
+  class='note-preview'
+  style={entry.data.heroImage?.color &&
+    `--preview-highlight:color-mix(in srgb,${entry.data.heroImage.color} 40%,hsl(var(--foreground)/var(--un-text-opacity,1)));
+    --preview-highlight-bg:hsl(from ${entry.data.heroImage.color} h s l/20%)`}
+>
   <a
     href={`/note/${entry.id}`}
-    class='group block
+    class:list={[
+      `group block
+    relative
+    w-full
+    overflow-hidden
     rounded-xl
     border
     border-border
@@ -24,13 +34,31 @@ const { entry } = Astro.props
     hover:border-foreground/20
     hover:bg-muted
     hover:text-primary
-    hover:shadow-sm'
+    hover:shadow-sm`,
+      entry.data.heroImage && 'max-md:pt-32 md:min-h-44'
+    ]}
     data-astro-prefetch
   >
-    <div class='flex items-start justify-between gap-4'>
-      <div class='min-w-0 flex-1 space-y-2'>
+    {
+      entry.data.heroImage && (
+        <Image
+          alt={entry.data.heroImage.alt || entry.data.title}
+          class='note-cover-image absolute end-0 top-0 z-0 h-28 w-full rounded-xl object-cover opacity-50 transition-opacity duration-300 group-hover:opacity-70 md:h-full md:w-3/5'
+          loading='eager'
+          {...entry.data.heroImage}
+        />
+      )
+    }
+
+    <div class='relative flex items-start justify-between gap-4' style='z-index:1'>
+      <div
+        class:list={[
+          'min-w-0 flex-1 space-y-2',
+          entry.data.heroImage && 'md:max-w-[62%]'
+        ]}
+      >
         <h3
-          class='text-lg font-medium leading-tight group-hover:text-foreground text-lg font-medium leading-tight transition-colors group-hover:text-primary'
+          class='text-lg font-medium leading-tight transition-colors group-hover:text-primary'
         >
           {entry.data.title}
         </h3>
@@ -90,6 +118,82 @@ const { entry } = Astro.props
       >
         {statusLabels[entry.data.status]}
       </span>
+
+      <svg
+        xmlns='http://www.w3.org/2000/svg'
+        width='16'
+        height='16'
+        viewBox='0 0 24 24'
+        fill='none'
+        stroke-width='2.5'
+        stroke-linecap='round'
+        stroke-linejoin='round'
+        class='preview-redirect absolute bottom-0 end-0 my-1 stroke-muted-foreground group-hover:stroke-primary'
+        aria-hidden='true'
+      >
+        <line
+          x1='5'
+          y1='12'
+          x2='19'
+          y2='12'
+          class='translate-x-4 scale-x-0 transition-all duration-300 ease-in-out group-hover:translate-x-1 group-hover:scale-x-100'
+        ></line>
+        <polyline
+          points='12 5 19 12 12 19'
+          class='translate-x-0 transition-all duration-300 ease-in-out group-hover:translate-x-1'
+        ></polyline>
+      </svg>
     </div>
   </a>
+
+  <style>
+    .note-preview {
+      --preview-highlight-final: var(
+        --preview-highlight,
+        hsl(var(--primary) / var(--un-text-opacity, 1))
+      );
+    }
+
+    .note-preview:hover {
+      & > a {
+        background-color: var(
+          --preview-highlight-bg,
+          hsl(var(--muted) / var(--un-bg-opacity, 1))
+        ) !important;
+        color: var(--preview-highlight-final) !important;
+      }
+
+      & > a .preview-redirect {
+        stroke: var(--preview-highlight-final) !important;
+      }
+    }
+
+    .note-cover-image {
+      -webkit-mask-image: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 1) 100%
+      );
+      mask-image: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 1) 100%
+      );
+    }
+
+    @media (max-width: 768px) {
+      .note-cover-image {
+        -webkit-mask-image: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0) 0%,
+          rgba(0, 0, 0, 1) 100%
+        );
+        mask-image: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0) 0%,
+          rgba(0, 0, 0, 1) 100%
+        );
+      }
+    }
+  </style>
 </li>
