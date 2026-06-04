@@ -6,7 +6,7 @@ accentColor: '#83d5d0'
 tags: ["Agent"]
 type: "note"
 status: 'in-progress'
-heroImage: { src: './kibou3.png', color: '#83d5d0' }
+heroImage: { src: './kibou3-cover.webp', color: '#83d5d0' }
 draft: false
 ---
 

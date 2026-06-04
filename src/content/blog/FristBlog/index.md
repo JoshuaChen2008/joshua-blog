@@ -7,7 +7,7 @@ tags:
   - Blog
   - 日常
 language: 'Chinese'
-heroImage: { src: './kibou2.png', color: '#83d5d0' }
+heroImage: { src: './kibou2-cover.webp', color: '#83d5d0' }
 ---
 
 ​	这个网站搭建的前前后后，差不多花了3天时间。
