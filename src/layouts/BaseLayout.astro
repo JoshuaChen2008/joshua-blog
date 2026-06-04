@@ -12,13 +12,20 @@ import '@/assets/styles/app.css'
 interface Props {
   meta: SiteMeta
   highlightColor?: string
+  highlightTone?: 'default' | 'soft'
 }
 
 const {
   meta: { articleDate, description = config.description, ogImage, title },
   highlightColor,
+  highlightTone = 'default',
   ...props
 } = Astro.props
+
+const highlightGradientClass =
+  highlightTone === 'soft'
+    ? 'pointer-events-none absolute start-0 top-0 z-0 h-[65vh] w-full opacity-[0.12] dark:opacity-[0.10]'
+    : 'pointer-events-none absolute start-0 top-0 z-0 h-screen w-full opacity-25'
 ---
 
 <html lang={config.locale.lang}>
@@ -32,7 +39,7 @@ const {
       highlightColor && (
         <div
           id='highlight-gradient'
-          class='pointer-events-none absolute start-0 top-0 z-0 h-screen w-full opacity-25'
+          class={highlightGradientClass}
           style={`background-image:linear-gradient(${highlightColor},transparent)`}
         />
       )
