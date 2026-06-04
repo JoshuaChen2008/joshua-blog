@@ -76,7 +76,9 @@ const note = defineCollection({
       relatedBlog: z.array(z.string()).optional(),
       relatedNote: z.array(z.string()).optional(),
       // External source or reference URL
-      source: z.string().url().optional()
+      source: z.string().url().optional(),
+      // Special fields
+      comment: z.boolean().default(true)
     })
 })
 

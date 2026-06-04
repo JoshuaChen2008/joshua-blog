@@ -1,0 +1,21 @@
+[
+  {
+    "url": "/blog/FristBlog/",
+    "nick": "Joshua",
+    "mail": "joshua@example.com",
+    "link": "",
+    "comment": "这是一条历史评论示例。",
+    "createdAt": "2026-06-04T10:00:00+08:00",
+    "pid": "",
+    "rid": "",
+    "at": "",
+    "ua": "",
+    "status": "approved"
+  },
+  {
+    "url": "/note/RAG demo",
+    "nick": "Joshua",
+    "comment": "路径中的空格会被格式化为 %20。",
+    "createdAt": "2026-06-04T10:05:00+08:00"
+  }
+]

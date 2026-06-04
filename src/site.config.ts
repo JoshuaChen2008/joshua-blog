@@ -1,5 +1,7 @@
 import type { CardListData, Config, IntegrationUserConfig, ThemeUserConfig } from 'astro-pure/types'
 
+const walineServer = import.meta.env.PUBLIC_WALINE_SERVER_URL ?? ''
+
 export const theme: ThemeUserConfig = {
   // [Basic]
   /** Title for your website. Will be used in metadata and as browser tab title. */
@@ -163,9 +165,9 @@ export const integ: IntegrationUserConfig = {
   },
   // Comment system
   waline: {
-    enable: false,
-    // Server service link
-    server: 'https://astro-theme-pure-waline.arthals.ink/',
+    enable: true,
+    // Server service link. Set this in Vercel/Astro env after deploying Waline.
+    server: walineServer,
     // Show meta info for comments
     showMeta: false,
     // Refer https://waline.js.org/en/guide/features/emoji.html
@@ -176,8 +178,13 @@ export const integ: IntegrationUserConfig = {
       pageview: true,
       comment: true,
       locale: {
-        reaction0: 'Like',
-        placeholder: 'Welcome to comment. (Email to receive replies. Login is unnecessary)'
+        reaction0: '点赞',
+        placeholder: '欢迎评论。填写邮箱可以收到回复提醒，不登录也可以留言。',
+        sofa: '还没有评论，来坐第一个沙发吧。',
+        submit: '提交',
+        nick: '昵称',
+        mail: '邮箱',
+        link: '网站'
       },
       imageUploader: false
     }

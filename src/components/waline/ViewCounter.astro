@@ -1,0 +1,59 @@
+---
+import config from '@/site-config'
+
+const walineConfig = config.integ.waline
+const enabled = walineConfig.enable && !!walineConfig.server
+---
+
+{enabled && <waline-view-counter data-server={walineConfig.server}></waline-view-counter>}
+
+<script>
+  import { commentCount, pageviewCount } from '@waline/client'
+
+  const normalizePath = (value: string) => {
+    const rawValue = value.trim()
+    if (!rawValue) return ''
+
+    let pathname = rawValue
+    try {
+      pathname = new URL(rawValue).pathname
+    } catch {
+      pathname = rawValue.split(/[?#]/, 1)[0]
+    }
+
+    pathname = pathname.replace(/\\/g, '/').replace(/\/{2,}/g, '/')
+    if (!pathname.startsWith('/')) pathname = `/${pathname}`
+
+    try {
+      return encodeURI(decodeURI(pathname))
+    } catch {
+      return encodeURI(pathname)
+    }
+  }
+
+  class WalineViewCounter extends HTMLElement {
+    connectedCallback() {
+      // The full comment widget already refreshes detail-page pageview and comment counters.
+      if (document.querySelector('comment-component')) return
+
+      const serverURL = this.dataset.server || ''
+      if (!serverURL) return
+
+      document
+        .querySelectorAll<HTMLElement>(
+          '.waline-pageview-count, .waline-pageview-readonly, .waline-comment-count'
+        )
+        .forEach((el) => {
+          if (el.dataset.path) el.dataset.path = normalizePath(el.dataset.path)
+        })
+
+      pageviewCount({ serverURL, selector: '.waline-pageview-count' })
+      pageviewCount({ serverURL, selector: '.waline-pageview-readonly', update: false })
+      commentCount({ serverURL, selector: '.waline-comment-count' })
+    }
+  }
+
+  if (!customElements.get('waline-view-counter')) {
+    customElements.define('waline-view-counter', WalineViewCounter)
+  }
+</script>

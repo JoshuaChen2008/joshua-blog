@@ -6,10 +6,12 @@ import '@waline/client/style'
 import { cn } from 'astro-pure/utils'
 
 const { class: className } = Astro.props
+
+const walineReady = config.integ.waline.enable && !!config.integ.waline.server
 ---
 
 {
-  config.integ.waline.enable && (
+  walineReady && (
     <comment-component>
       <div id='waline' class={cn('not-prose', className)}>
         Comment seems to stuck. Try to refresh?✨
@@ -24,6 +26,27 @@ const { class: className } = Astro.props
   import config from 'virtual:config'
 
   const walineConfig = config.integ.waline
+
+  const normalizePath = (value: string) => {
+    const rawValue = value.trim()
+    if (!rawValue) return ''
+
+    let pathname = rawValue
+    try {
+      pathname = new URL(rawValue).pathname
+    } catch {
+      pathname = rawValue.split(/[?#]/, 1)[0]
+    }
+
+    pathname = pathname.replace(/\\/g, '/').replace(/\/{2,}/g, '/')
+    if (!pathname.startsWith('/')) pathname = `/${pathname}`
+
+    try {
+      return encodeURI(decodeURI(pathname))
+    } catch {
+      return encodeURI(pathname)
+    }
+  }
 
   class Comment extends HTMLElement {
     constructor() {
@@ -42,9 +65,17 @@ const { class: className } = Astro.props
         (preset) => `${config.npmCDN}/@waline/emojis@1.2.0/${preset}` as WalineEmojiPresets
       )
 
+      const path = normalizePath(window.location.pathname)
+      document
+        .querySelectorAll<HTMLElement>('.waline-pageview-count, .waline-comment-count')
+        .forEach((el) => {
+          if (el.dataset.path) el.dataset.path = normalizePath(el.dataset.path)
+        })
+
       walineInit({
         el: 'comment-component #waline',
         serverURL: walineConfig.server || '',
+        path,
         emoji,
         reaction: ['/icons/heart-item.svg'],
         ...walineConfig.additionalConfigs
@@ -52,7 +83,9 @@ const { class: className } = Astro.props
     }
   }
 
-  if (walineConfig.enable) customElements.define('comment-component', Comment)
+  if (walineConfig.enable && walineConfig.server && !customElements.get('comment-component')) {
+    customElements.define('comment-component', Comment)
+  }
 </script>
 
 {

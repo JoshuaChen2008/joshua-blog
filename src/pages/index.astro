@@ -6,7 +6,6 @@ import { PostPreview } from 'astro-pure/components/pages'
 import { getBlogCollection, sortMDByDate } from 'astro-pure/server'
 import { Button, Card, Icon, Label } from 'astro-pure/user'
 import PageLayout from '@/layouts/BaseLayout.astro'
-import ProjectCard from '@/components/home/ProjectCard.astro'
 import Section from '@/components/home/Section.astro'
 import SkillLayout from '@/components/home/SkillLayout.astro'
 import config from '@/site-config'
@@ -99,13 +98,10 @@ if (!images[imagePath])
 
       
         <Section title='Experience'>
-      <Card
+        <Card
         heading='杭州星业品牌管理有限公司'
         subheading='直播运营助理'
         date='7月 2025 - 9月 2026'
-        imagePath='/src/assets/about-astro.png'
-        altText='Lorem, ipsum dolor sit'
-        imageClass='h-12 w-auto md:-start-16'
       />
     </Section> 
 
