@@ -14,7 +14,8 @@ const cards = [
     href: 'https://www.joyehuang.me/',
     label: 'Joye',
     icon: JoyeIcon,
-    labelSide: 'right'
+    labelSide: 'right',
+    preserveColor: true
   },
   {
     className: 'im-cta-photo-2',
@@ -60,7 +61,7 @@ const cards = [
       {
         cards.map((card) => (
           <button
-            class={`im-cta-photo ${card.className} im-label-${card.labelSide}`}
+            class={`im-cta-photo ${card.className} im-label-${card.labelSide}${card.preserveColor ? ' im-preserve-color' : ''}`}
             type='button'
             data-url={card.href}
             aria-label={`Open ${card.label}`}
@@ -216,8 +217,12 @@ const cards = [
     transition: filter 0.35s ease;
   }
 
-  :global(.dark) .im-cta-photo .im-cta-icon {
+  :global(.dark) .im-cta-photo:not(.im-preserve-color) .im-cta-icon {
     filter: brightness(0) invert(1);
+  }
+
+  :global(.dark) .im-cta-photo.im-preserve-color .im-cta-icon {
+    filter: none;
   }
 
   .im-cta-label {
