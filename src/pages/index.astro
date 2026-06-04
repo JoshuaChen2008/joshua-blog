@@ -12,9 +12,17 @@ import config from '@/site-config'
 
 const languages = ['TypeScript', 'JavaScript', 'Java', 'SQL']
 const frontend = ['Next.js', 'React', 'TailWind CSS', 'Vite']
-const backend = ['Vercel', 'Node.js','MongoDB']
-const Agent = ['Claude Code','Transformer','Multi-Agent','LLM','RAG','Prompt Engineering','Function Calling']
-const Tools = ['Codex','Opencode','Git','Docker','Figma','Stitch']
+const backend = ['Vercel', 'Node.js', 'MongoDB']
+const Agent = [
+  'Claude Code',
+  'Transformer',
+  'Multi-Agent',
+  'LLM',
+  'RAG',
+  'Prompt Engineering',
+  'Function Calling'
+]
+const Tools = ['Codex', 'Opencode', 'Git', 'Docker', 'Figma', 'Stitch']
 
 const MAX_POSTS = 10
 const allPosts = await getBlogCollection()
@@ -47,12 +55,7 @@ if (!images[imagePath])
           <Label title='中国 天津/杭州'>
             <Icon name='location' class='size-5' slot='icon' />
           </Label>
-          <Label
-            title='GitHub'
-            as='a'
-            href='https://github.com/JoshuaChen2008'
-            target='_blank'
-          >
+          <Label title='GitHub' as='a' href='https://github.com/JoshuaChen2008' target='_blank'>
             <Icon name='github' class='size-5' slot='icon' />
           </Label>
         </div>
@@ -77,7 +80,7 @@ if (!images[imagePath])
       <Section title='About'>
         <p class='text-muted-foreground'>AI Agent & Full-Stack Developer</p>
         <p class='text-muted-foreground'>
-            天津理工大学在读，目前为大一学生，致力于研究和开发有用且有趣的产品，正在学习LLM和Agent开发，喜欢将新技术用于工程实践中，在意产品能不能真正跑起来，也在意市场的反馈
+          天津理工大学在读，目前为大一学生，致力于研究和开发有用且有趣的产品，正在学习LLM和Agent开发，喜欢将新技术用于工程实践中。
         </p>
         <Button title='More about me' class='w-fit self-end' href='/about' variant='ahead' />
       </Section>
@@ -96,32 +99,30 @@ if (!images[imagePath])
         )
       }
 
-      
-        <Section title='Experience'>
+      <Section title='Experience'>
         <Card
-        heading='杭州星业品牌管理有限公司'
-        subheading='直播运营助理'
-        date='7月 2025 - 9月 2026'
-      />
-    </Section> 
+          heading='杭州星业品牌管理有限公司'
+          subheading='直播运营助理'
+          date='7月 2025 - 9月 2026'
+        />
+      </Section>
 
-        <Section title='Open Source'>
+      <Section title='Open Source'>
         <Card
           as='a'
           heading='pot-app-translate-plugin-TencentTMT'
           subheading='腾讯云机器翻译 TMT 插件 - 一个为 Pot 开发的翻译插件。'
-          date='9月 2025 - 6月 2029'>
-        </Card>
-       
+          date='9月 2025 - 6月 2029'
+        />
 
         <Card
           as='a'
           heading='A-type-game-of-web'
           subheading='基于React+TypeScript+TailwindCSS的打字网站'
           date='9月 2025 - 6月 2029'
-        ></Card>  </Section>
+        />
+      </Section>
 
-      
       <Section title='Education'>
         <Card
           as='a'
@@ -140,8 +141,6 @@ if (!images[imagePath])
           }
         </Card>
       </Section>
-
-      
 
       <Section title='Skills'>
         <SkillLayout title='Languages' skills={languages} />

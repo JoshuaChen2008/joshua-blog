@@ -177,6 +177,7 @@ export const integ: IntegrationUserConfig = {
       // search: false,
       pageview: true,
       comment: true,
+      login: 'enable',
       locale: {
         reaction0: '点赞',
         placeholder: '欢迎评论。填写邮箱可以收到回复提醒，不登录也可以留言。',
