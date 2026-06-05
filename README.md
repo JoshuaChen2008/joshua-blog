@@ -1,99 +1,99 @@
-# Astro Theme Pure
+# Joshua Chen's Personal Blog
 
-English | [简体中文](./README-zh-CN.md)
+一个基于 Astro 和 Astro Theme Pure 构建的个人博客，用来记录技术学习、项目实践、开源探索和一些个人兴趣。
 
-A simple, fast and powerful blog & document theme built by Astro.
+仓库地址：[JoshuaChen2008/joshua-blog](https://github.com/JoshuaChen2008/joshua-blog)
 
-[![GitHub deployments](https://img.shields.io/github/deployments/cworld1/astro-theme-pure/production?style=flat&logo=vercel&label=vercel)](https://astro-pure.js.org/)
-[![NPM Version](https://img.shields.io/npm/v/astro-pure?logo=npm&style=flat)](https://www.npmjs.com/package/astro-pure)
-[![GitHub Release](https://img.shields.io/github/v/release/cworld1/astro-theme-pure?include_prereleases&style=flat&label=template)](https://github.com/cworld1/astro-theme-pure/releases)
-[![GitHub License](https://img.shields.io/github/license/cworld1/astro-theme-pure?style=flat)](https://github.com/cworld1/astro-theme-pure/blob/main/LICENSE)
+---
 
-![image](./.github/assets/header.webp)
-![image](./.github/assets/body.webp)
+## About me
 
-> [!NOTE]
-> Known issues: Header & customize options is still under development (template exposed still).
+AI Agent & Full-Stack Developer
 
-## Introduction
+我目前就读于天津理工大学，是一名大一学生。正在朝着全栈开发者和活跃开源贡献者的方向学习与成长，希望通过代码实践、项目积累和社区交流不断提升自己。
 
-Checkout [Demo Site →](https://astro-pure.js.org/)
+平时喜欢在 VRChat、Unity 等软件中进行类摄影创作，也喜欢折腾电子设备，并持续关注新兴电子产品。
 
-### :fire: Features
+## 技术栈
 
-- [x] :rocket: Fast & high performance
-- [x] :star: Simple & clean design
-- [x] :iphone: Responsive design
-- [x] :mag: Full-site search built with [pagefind](https://pagefind.app/)
-- [x] :world_map: Sitemap & RSS feed
-- [x] :spider_web: SEO-friendly
-- [x] :book: TOC (table of contents)
-- [x] :framed_picture: Dynamic open graph generation for posts
-- [x] :framed_picture: Mediumzoom lightbox for images
+### 核心
 
-### :package: Components
+Astro, TypeScript, Bun
 
-Theme includes a lot of components, which can not only be used in the theme, but also in other astro projects.
+### 内容与样式
 
-> For other astro projects, UnoCSS is required. See [Package README](https://github.com/cworld1/astro-theme-pure/blob/main/packages/pure/README.md#use-with-common-astro-project) for more details.
+MDX, UnoCSS, Shiki, KaTeX
 
-- Basic components: `Aside`, `Tabs`, `Timeline`, `Steps`, `Spoiler`...
-- Advanced components: `GithubCard`, `LinkPreview`, `Quote`, `QRCode`...
+### 功能
 
-### :white_check_mark: Lighthouse score
+RSS, Sitemap, Pagefind, Waline, Dynamic OG Image
 
-[![lighthouse-score](./.github/assets/lighthouse-score.png)](https://pagespeed.web.dev/analysis/https-cworld-top/o229zrt5o4?form_factor=mobile&hl=en)
+### 部署
 
-## Documentation
+Vercel, Astro Adapter
 
-[Docs](https://astro-pure.js.org/docs) | [Showcase](https://github.com/cworld1/astro-theme-pure/issues/10)
+## 本地开发
 
-## Package
+环境要求：
 
-See [astro-theme-pure](https://www.npmjs.com/package/astro-pure) on npm.
+- [Node.js](https://nodejs.org/)：建议使用 `v22.12.0` 或更高版本
+- [Bun](https://bun.sh/)：项目统一使用 Bun 管理依赖和运行脚本
 
-## Local development
-
-Environment requirements:
-
-- [Nodejs](https://nodejs.org/): 18.0.0+
-
-Clone the repository:
+克隆仓库：
 
 ```shell
-git clone https://github.com/cworld1/astro-theme-pure.git
-cd astro-theme-pure
+git clone https://github.com/JoshuaChen2008/joshua-blog.git
+cd joshua-blog
 ```
 
-Useful commands:
+常用命令：
 
 ```shell
-# Install dependencies
+# 安装依赖
 bun install
-# Start the dev server
-bun dev
-# Build the project
+
+# 启动开发服务器
+bun run dev
+
+# 构建项目
 bun run build
-# Preview (after the build)
-bun preview
-# Create a new post
-bun pure new
+
+# 预览构建结果
+bun run preview
+
+# 同步 Astro 类型
+bun run sync
+
+# 类型检查
+bun run check
+
+# 创建新文章
+bun run pure new
+
+# 格式化代码
+bun run format
+
+# 代码检查
+bun run lint
+
+# 一键检查与格式化
+bun run yijiansilian
 ```
 
-## Contributions
+## 特性
 
-To spend more time coding and less time fiddling with whitespace, this project uses code conventions and styles to encourage consistency. Code with a consistent style is easier (and less error-prone!) to review, maintain, and understand.
+- 快速、高性能的 Astro 内容站点
+- 简洁、响应式的页面设计
+- 支持博客、笔记、项目页和关于页等内容组织方式
+- 内置全站搜索、RSS、Sitemap 与 SEO 配置
+- 支持文章目录、代码高亮、数学公式与图片灯箱
+- 支持动态 Open Graph 图片生成
+- 支持评论、浏览量和友链等常见博客能力
 
-## Thanks
+## 主题
 
-- [Astro Cactus](https://github.com/chrismwilliams/astro-theme-cactus)
-- [Astro Resume](https://github.com/srleom/astro-theme-resume)
-- [Starlight](https://github.com/withastro/starlight)
+本博客基于 [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure) 主题构建，并在此基础上进行个人化配置与内容创作。
 
-Other third party references are on [Docs#Contributions](https://astro-pure.js.org/docs/advanced/about). Appreciate for all open source libraries.
+## 许可
 
-## License
-
-This project is licensed under the Apache 2.0 License.
-
-[![Star History Chart](https://api.star-history.com/svg?repos=cworld1/astro-theme-pure&type=Date)](https://star-history.com/#cworld1/astro-theme-pure&Date)
+本项目基于 Apache 2.0 协议开源。

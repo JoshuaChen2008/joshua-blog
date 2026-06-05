@@ -13,8 +13,26 @@ body:
   - type: textarea
     id: environment-auto-check
     attributes:
-      label: Run command like `bun astro-pure info`, `bun astro info`
-      description: Paste your auto check command information.
+      label: Environment information
+      description: |
+        Run these commands in the project root and paste the full output:
+        - `bun run pure info`
+        - `bun run astro info`
+
+        If `astro info` asks "Copy to clipboard?", choose `No` or press Enter, then paste the output shown above the prompt.
+      placeholder: |
+        Astro Theme Pure:
+        - Package:
+        - Node.js:
+        - Platform:
+
+        Astro:
+        Astro                    ...
+        Node                     ...
+        System                   ...
+        Package Manager          ...
+    validations:
+      required: true
   - type: textarea
     id: bug-description
     attributes:
@@ -25,7 +43,8 @@ body:
   - type: input
     id: browser
     attributes:
-      label: If this issue only occurs in one browser, which browser is a problem?
+      label: Browser, if browser-specific
+      description: Leave this blank if the issue is not specific to one browser.
       placeholder: Chrome, Firefox, Safari
   - type: checkboxes
     id: will-pr
