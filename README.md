@@ -3,6 +3,7 @@
 一个基于 Astro 和 Astro Theme Pure 构建的个人博客，用来记录技术学习、项目实践、开源探索和一些个人兴趣。
 
 仓库地址：[JoshuaChen2008/joshua-blog](https://github.com/JoshuaChen2008/joshua-blog)
+网页链接：blog.joshua2008.top
 
 ---
 
