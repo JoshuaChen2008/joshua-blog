@@ -2,20 +2,66 @@
 import avatarIcon from '@/assets/avatar.webp?url'
 import devinIcon from '@/assets/tools/anti.svg?url'
 import grokIcon from '@/assets/tools/arcticons--openai-chatgpt.svg?url'
-import codexIcon from '@/assets/tools/codex.svg?url'
 import geminiIcon from '@/assets/tools/ri--gemini-fill.svg?url'
 import claudeIcon from '@/assets/tools/simple-icons--claude.svg?url'
 import cursorIcon from '@/assets/tools/vscode1.svg?url'
 import JoyeIcon from '@/assets/link/Joye.png?url'
+import links from '@/public/links.json'
 
-const cards = [
+type FriendLink = {
+  name?: string
+  intro?: string
+  description?: string
+  desc?: string
+  link?: string
+}
+
+type CtaCard = {
+  className: string
+  href: string
+  label: string
+  icon: string
+  labelSide: 'left' | 'right'
+  preserveColor?: boolean
+  description?: string
+  linkKey?: string
+}
+
+const normalizeLinkKey = (value?: string) =>
+  (value ?? '').trim().replace(/\/$/, '').toLocaleLowerCase()
+
+const friendLinks = links.friends.flatMap((group) => group.link_list) as FriendLink[]
+
+const resolveDescription = (card: CtaCard) => {
+  const customDescription = card.description?.trim()
+  if (customDescription) return customDescription
+
+  const explicitKey = normalizeLinkKey(card.linkKey)
+  const hrefKey = normalizeLinkKey(card.href)
+  const labelKey = normalizeLinkKey(card.label)
+  const friend = friendLinks.find((item) => {
+    const nameKey = normalizeLinkKey(item.name)
+    const linkKey = normalizeLinkKey(item.link)
+
+    return (
+      (explicitKey && (explicitKey === nameKey || explicitKey === linkKey)) ||
+      (hrefKey && hrefKey === linkKey) ||
+      (labelKey && labelKey === nameKey)
+    )
+  })
+
+  return friend?.intro?.trim() || friend?.description?.trim() || friend?.desc?.trim()
+}
+
+const cards: CtaCard[] = [
   {
     className: 'im-cta-photo-1',
     href: 'https://www.joyehuang.me/',
     label: 'Joye',
     icon: JoyeIcon,
     labelSide: 'right',
-    preserveColor: true
+    preserveColor: true,
+    description: 'Joye 的个人网站，记录技术、生活和持续生长的灵感片段。'
   },
   {
     className: 'im-cta-photo-2',
@@ -53,13 +99,18 @@ const cards = [
     labelSide: 'left'
   }
 ]
+
+const cardsWithDescriptions = cards.map((card) => ({
+  ...card,
+  resolvedDescription: resolveDescription(card)
+}))
 ---
 
 <section id='ludus-cta' class='im-section im-bottom-cta not-prose'>
   <div class='im-bottom-cta-wrap'>
     <div class='im-bottom-cta-media'>
       {
-        cards.map((card) => (
+        cardsWithDescriptions.map((card) => (
           <button
             class={`im-cta-photo ${card.className} im-label-${card.labelSide}${card.preserveColor ? ' im-preserve-color' : ''}`}
             type='button'
@@ -67,7 +118,14 @@ const cards = [
             aria-label={`Open ${card.label}`}
           >
             <img src={card.icon} alt='' class='im-cta-icon' loading='lazy' />
-            <span class='im-cta-label'>{card.label}</span>
+            <span class='im-cta-tooltip'>
+              <span class='im-cta-label'>{card.label}</span>
+              {
+                card.resolvedDescription && (
+                  <span class='im-cta-description'>{card.resolvedDescription}</span>
+                )
+              }
+            </span>
           </button>
         ))
       }
@@ -79,7 +137,9 @@ const cards = [
         aria-label='Open Joshua GitHub'
       >
         <img src={avatarIcon} alt='' class='im-cta-icon' loading='lazy' />
-        <span class='im-cta-label'>Joshua Chen</span>
+        <span class='im-cta-tooltip'>
+          <span class='im-cta-label'>Joshua Chen</span>
+        </span>
       </button>
     </div>
   </div>
@@ -225,10 +285,26 @@ const cards = [
     filter: none;
   }
 
-  .im-cta-label {
+  .im-cta-tooltip {
     position: absolute;
-    top: 50%;
+    top: 44%;
     z-index: 4;
+    display: flex;
+    width: max-content;
+    max-width: min(14rem, calc(100vw - 2rem));
+    flex-direction: column;
+    gap: 0.38rem;
+    align-items: flex-start;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transition:
+      opacity 0.22s ease,
+      visibility 0s linear 0.22s,
+      transform 0.34s cubic-bezier(0.2, 0.9, 0.2, 1.25);
+  }
+
+  .im-cta-label {
     width: max-content;
     max-width: 8rem;
     border: 1px solid var(--im-label-border);
@@ -239,58 +315,70 @@ const cards = [
     font-size: 0.78rem;
     font-weight: 500;
     line-height: 1;
-    opacity: 0;
-    pointer-events: none;
-    visibility: hidden;
     white-space: nowrap;
     box-shadow: 0 10px 22px var(--im-label-shadow);
-    transition:
-      opacity 0.22s ease,
-      visibility 0s linear 0.22s,
-      transform 0.34s cubic-bezier(0.2, 0.9, 0.2, 1.25);
   }
 
-  .im-label-right .im-cta-label {
+  .im-cta-description {
+    max-width: min(14rem, calc(100vw - 2rem));
+    border: 1px solid var(--im-label-border);
+    border-radius: 8px;
+    background-color: var(--im-label-bg);
+    padding: 0.48rem 0.62rem;
+    color: var(--im-label-color);
+    font-size: 0.72rem;
+    font-weight: 400;
+    line-height: 1.45;
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    box-shadow: 0 12px 26px var(--im-label-shadow);
+  }
+
+  .im-label-right .im-cta-tooltip {
     left: calc(100% + 0.42rem);
-    transform: translate(-0.9rem, -50%) scale(0.86);
+    transform: translate(-0.9rem, -58%) scale(0.86);
     transform-origin: left center;
   }
 
-  .im-label-left .im-cta-label {
+  .im-label-left .im-cta-tooltip {
     right: calc(100% + 0.42rem);
-    transform: translate(0.9rem, -50%) scale(0.86);
+    align-items: flex-end;
+    transform: translate(0.9rem, -58%) scale(0.86);
     transform-origin: right center;
   }
 
-  .im-center-card .im-cta-label {
+  .im-center-card .im-cta-tooltip {
     top: auto;
-    bottom: calc(100% + 0.42rem);
+    bottom: calc(100% + 0.62rem);
     left: 50%;
+    align-items: center;
     transform: translate(-50%, 0.9rem) scale(0.86);
     transform-origin: center bottom;
   }
 
-  .im-cta-photo.is-hovered .im-cta-label,
-  .im-center-card.is-hovered .im-cta-label,
-  .im-cta-photo:focus-visible .im-cta-label,
-  .im-center-card:focus-visible .im-cta-label {
+  .im-cta-photo.is-hovered .im-cta-tooltip,
+  .im-center-card.is-hovered .im-cta-tooltip,
+  .im-cta-photo:focus-visible .im-cta-tooltip,
+  .im-center-card:focus-visible .im-cta-tooltip {
     opacity: 1;
     visibility: visible;
     transition-delay: 0s;
   }
 
-  .im-label-right.is-hovered .im-cta-label,
-  .im-label-right:focus-visible .im-cta-label {
-    transform: translate(0.18rem, -50%) scale(1);
+  .im-label-right.is-hovered .im-cta-tooltip,
+  .im-label-right:focus-visible .im-cta-tooltip {
+    transform: translate(0.18rem, -58%) scale(1);
   }
 
-  .im-label-left.is-hovered .im-cta-label,
-  .im-label-left:focus-visible .im-cta-label {
-    transform: translate(-0.18rem, -50%) scale(1);
+  .im-label-left.is-hovered .im-cta-tooltip,
+  .im-label-left:focus-visible .im-cta-tooltip {
+    transform: translate(-0.18rem, -58%) scale(1);
   }
 
-  .im-center-card.is-hovered .im-cta-label,
-  .im-center-card:focus-visible .im-cta-label {
+  .im-center-card.is-hovered .im-cta-tooltip,
+  .im-center-card:focus-visible .im-cta-tooltip {
     transform: translate(-50%, -0.18rem) scale(1);
   }
 
@@ -430,10 +518,22 @@ const cards = [
       margin: -34px 0 0 -34px;
     }
 
+    .im-cta-tooltip {
+      max-width: min(12rem, 72vw);
+      gap: 0.32rem;
+    }
+
     .im-cta-label {
       max-width: 7rem;
       padding: 0.28rem 0.58rem;
       font-size: 0.72rem;
+    }
+
+    .im-cta-description {
+      max-width: min(12rem, 72vw);
+      padding: 0.42rem 0.54rem;
+      font-size: 0.68rem;
+      line-height: 1.42;
     }
   }
 </style>
