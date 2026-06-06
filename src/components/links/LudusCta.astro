@@ -6,8 +6,11 @@ import geminiIcon from '@/assets/tools/ri--gemini-fill.svg?url'
 import claudeIcon from '@/assets/tools/simple-icons--claude.svg?url'
 import cursorIcon from '@/assets/tools/vscode1.svg?url'
 import JoyeIcon from '@/assets/link/Joye.png?url'
+//Joye哥的blog
 import links from '@/public/links.json'
 
+import GuGuIcon from '@/assets/link/slime-happy-light.svg?url'
+//咕咕咕的blog
 type FriendLink = {
   name?: string
   intro?: string
@@ -65,10 +68,12 @@ const cards: CtaCard[] = [
   },
   {
     className: 'im-cta-photo-2',
-    href: 'https://claude.ai',
-    label: 'Claude',
-    icon: claudeIcon,
-    labelSide: 'left'
+    href: 'https://blog.cooingcode.space/',
+    label: '咕咕咕',
+    icon: GuGuIcon,
+    labelSide: 'left',
+    preserveColor: true,
+    description: '我是咕咕咕Cooing，全栈Agent开发工程师，底边键盘手，遨游星海的鸽子一只'//dark模式是否反相
   },
   {
     className: 'im-cta-photo-3',
