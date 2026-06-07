@@ -2,7 +2,7 @@
 title: '第一篇博客'
 publishDate: 2026-06-03
 updatedDate: 2026-06-03
-description: '这个网站建立后的第一篇博客，也是我写的第一篇博客'
+description: '这个网站建立后的第一篇博客，也是我人生中写的第一篇博客'
 tags:
   - Blog
   - 日常
