@@ -1,6 +1,6 @@
 import type { CardListData, Config, IntegrationUserConfig, ThemeUserConfig } from 'astro-pure/types'
 
-const walineServer = import.meta.env.PUBLIC_WALINE_SERVER_URL ?? ''
+const walineServer = import.meta.env.PUBLIC_WALINE_SERVER_URL?.trim() ?? ''
 
 export const theme: ThemeUserConfig = {
   // [Basic]
@@ -186,8 +186,7 @@ export const integ: IntegrationUserConfig = {
         nick: '昵称',
         mail: '邮箱',
         link: '网站'
-      },
-      imageUploader: false
+      }
     }
   }
 }

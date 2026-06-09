@@ -7,12 +7,21 @@ import { cn } from 'astro-pure/utils'
 
 const { class: className } = Astro.props
 
-const walineReady = config.integ.waline.enable && !!config.integ.waline.server
+const walineConfig = config.integ.waline
+const walineReady = walineConfig.enable && !!walineConfig.server
+const walineClientConfig = {
+  additionalConfigs: walineConfig.additionalConfigs,
+  emoji: walineConfig.emoji,
+  npmCDN: config.npmCDN
+}
 ---
 
 {
   walineReady && (
-    <comment-component>
+    <comment-component
+      data-client-config={JSON.stringify(walineClientConfig)}
+      data-server={walineConfig.server}
+    >
       <div id='waline' class={cn('not-prose', className)}>
         Comment seems to stuck. Try to refresh?✨
       </div>
@@ -21,12 +30,6 @@ const walineReady = config.integ.waline.enable && !!config.integ.waline.server
 }
 
 <script>
-  import { init as walineInit } from '@waline/client'
-  import type { WalineEmojiPresets } from '@waline/client'
-  import config from 'virtual:config'
-
-  const walineConfig = config.integ.waline
-
   const normalizePath = (value: string) => {
     const rawValue = value.trim()
     if (!rawValue) return ''
@@ -48,12 +51,25 @@ const walineReady = config.integ.waline.enable && !!config.integ.waline.server
     }
   }
 
-  class Comment extends HTMLElement {
-    constructor() {
-      super()
-    }
+  class WalineComment extends HTMLElement {
+    async connectedCallback() {
+      if (this.dataset.walineMounted === 'true') return
+      this.dataset.walineMounted = 'true'
 
-    connectedCallback() {
+      const serverURL = this.dataset.server?.trim()
+      if (!serverURL) return
+
+      let clientConfig: {
+        additionalConfigs?: Record<string, unknown>
+        emoji?: string[]
+        npmCDN?: string
+      } = {}
+      try {
+        clientConfig = JSON.parse(this.dataset.clientConfig || '{}')
+      } catch {
+        clientConfig = {}
+      }
+
       // Prevent Vue log errors
       ;(globalThis as unknown as { __VUE_OPTIONS_API__: boolean }).__VUE_OPTIONS_API__ = true
       ;(globalThis as unknown as { __VUE_PROD_DEVTOOLS__: boolean }).__VUE_PROD_DEVTOOLS__ = false
@@ -61,9 +77,10 @@ const walineReady = config.integ.waline.enable && !!config.integ.waline.server
         globalThis as unknown as { __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: boolean }
       ).__VUE_PROD_HYDRATION_MISMATCH_DETAILS__ = false
 
-      const emoji = walineConfig.emoji?.map(
-        (preset) => `${config.npmCDN}/@waline/emojis@1.2.0/${preset}` as WalineEmojiPresets
-      )
+      const { init: walineInit } = await import('@waline/client')
+      const emoji = clientConfig.emoji?.map((preset) => {
+        return `${clientConfig.npmCDN}/@waline/emojis@1.2.0/${preset}`
+      }) as Parameters<typeof walineInit>[0]['emoji']
 
       const path = normalizePath(window.location.pathname)
       document
@@ -73,18 +90,18 @@ const walineReady = config.integ.waline.enable && !!config.integ.waline.server
         })
 
       walineInit({
-        el: 'comment-component #waline',
-        serverURL: walineConfig.server || '',
+        el: this.querySelector<HTMLElement>('#waline'),
+        serverURL,
         path,
         emoji,
         reaction: ['/icons/heart-item.svg'],
-        ...walineConfig.additionalConfigs
+        ...clientConfig.additionalConfigs
       })
     }
   }
 
-  if (walineConfig.enable && walineConfig.server && !customElements.get('comment-component')) {
-    customElements.define('comment-component', Comment)
+  if (!customElements.get('comment-component')) {
+    customElements.define('comment-component', WalineComment)
   }
 </script>
 
@@ -144,6 +161,9 @@ const walineReady = config.integ.waline.enable && !!config.integ.waline.server
   }
   #waline :global(a) {
     display: inline-block;
+  }
+  #waline :global(.wl-rss) {
+    display: none !important;
   }
 
   /* Reaction buttons */
