@@ -11,6 +11,10 @@ import links from '@/public/links.json'
 
 import GuGuIcon from '@/assets/link/slime-happy-light.svg?url'
 //咕咕咕的blog
+
+import xzwIcon from '@/assets/link/xzw.png?url'
+//xzw的blog
+
 type FriendLink = {
   name?: string
   intro?: string
@@ -73,14 +77,17 @@ const cards: CtaCard[] = [
     icon: GuGuIcon,
     labelSide: 'left',
     preserveColor: true,
-    description: '我是咕咕咕Cooing，全栈Agent开发工程师，底边键盘手，遨游星海的鸽子一只'//dark模式是否反相
+    description: '我是咕咕咕Cooing，全栈Agent开发工程师，底边键盘手，遨游星海的鸽子一只'
+    //dark模式是否反相
   },
   {
     className: 'im-cta-photo-3',
-    href: 'https://code.visualstudio.com/',
-    label: 'Vscode',
-    icon: cursorIcon,
-    labelSide: 'right'
+    href: 'https://www.arineko.xyz/',
+    label: 'ay4',
+    icon: xzwIcon,
+    labelSide: 'right',
+    preserveColor: true,
+    description:'我的产品也会梦见电子羊吗?'
   },
   {
     className: 'im-cta-photo-4',
