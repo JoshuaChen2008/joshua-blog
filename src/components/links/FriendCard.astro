@@ -1,0 +1,78 @@
+---
+import type { FriendLink } from '@/lib/links'
+
+import config from '@/site-config'
+
+interface Props {
+  friend: FriendLink
+}
+
+const { friend } = Astro.props
+const avatar =
+  (config.integ?.links?.cacheAvatar ?? false)
+    ? (friend.avatar_cache?.path ?? friend.avatar)
+    : friend.avatar
+---
+
+<a
+  href={friend.link}
+  target='_blank'
+  rel='noopener noreferrer'
+  class='group block h-full rounded-2xl no-underline outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+>
+  <article
+    class='relative h-full overflow-hidden rounded-2xl border bg-background px-3 py-2 transition-colors duration-200 group-hover:bg-muted sm:px-4'
+  >
+    <div class='relative z-10 flex h-full items-center gap-3'>
+      <div class='relative h-14 w-14 min-w-14 overflow-hidden rounded-full bg-card'>
+        <img
+          class='my-0 h-full w-full object-cover'
+          src={avatar}
+          width='80'
+          height='80'
+          alt={`${friend.name} 的头像`}
+          loading='lazy'
+          decoding='async'
+        />
+        <span
+          class='absolute inset-0 grid place-items-center rounded-full bg-foreground/0 transition-colors duration-200 group-hover:bg-foreground/50'
+          aria-hidden='true'
+        >
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            width='30'
+            height='30'
+            viewBox='0 0 24 24'
+            fill='none'
+            stroke-width='2.5'
+            stroke-linecap='round'
+            stroke-linejoin='round'
+            class='translate-x-[-0.25rem] stroke-background opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100'
+          >
+            <path d='M5 12h14'></path>
+            <path d='m13 6 6 6-6 6'></path>
+          </svg>
+        </span>
+      </div>
+
+      <div class='min-w-0'>
+        <p class='my-0 line-clamp-1 text-sm font-medium'>{friend.name}</p>
+        <p class='my-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground'>
+          {friend.desc}
+        </p>
+      </div>
+    </div>
+
+    <img
+      class='absolute -start-2 top-0 z-0 my-0 h-full w-2/3 object-cover opacity-15'
+      src={avatar}
+      width='160'
+      height='80'
+      alt=''
+      loading='lazy'
+      decoding='async'
+      aria-hidden='true'
+      style='mask-image:linear-gradient(to left,transparent,#000);-webkit-mask-image:linear-gradient(to left,transparent,#000)'
+    />
+  </article>
+</a>

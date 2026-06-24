@@ -2,6 +2,13 @@ import type { CardListData, Config, IntegrationUserConfig, ThemeUserConfig } fro
 
 const walineServer = import.meta.env.PUBLIC_WALINE_SERVER_URL?.trim() ?? ''
 
+export const siteLink = {
+  name: 'Joshua Chen Blog',
+  desc: 'AI Agent & Full-Stack Developer',
+  link: 'https://blog.joshua2008.top/',
+  avatar: 'https://blog.joshua2008.top/images/avatar.webp'
+} as const
+
 export const theme: ThemeUserConfig = {
   // [Basic]
   /** Title for your website. Will be used in metadata and as browser tab title. */
@@ -118,10 +125,10 @@ export const integ: IntegrationUserConfig = {
     ],
     // Yourself link info
     applyTip: [
-      { name: 'Name', val: theme.title },
-      { name: 'Desc', val: theme.description || 'Null' },
-      { name: 'Link', val: 'https://astro-pure.js.org/' },
-      { name: 'Avatar', val: 'https://astro-pure.js.org/favicon/favicon.ico' }
+      { name: 'Name', val: siteLink.name },
+      { name: 'Desc', val: siteLink.desc },
+      { name: 'Link', val: siteLink.link },
+      { name: 'Avatar', val: siteLink.avatar }
     ],
     // Cache avatars in `public/avatars/` to improve user experience.
     cacheAvatar: false

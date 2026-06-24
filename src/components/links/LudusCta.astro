@@ -1,597 +1,228 @@
 ---
-import avatarIcon from '@/assets/avatar.webp?url'
-import devinIcon from '@/assets/tools/anti.svg?url'
-import grokIcon from '@/assets/tools/arcticons--openai-chatgpt.svg?url'
-import geminiIcon from '@/assets/tools/ri--gemini-fill.svg?url'
-import claudeIcon from '@/assets/tools/simple-icons--claude.svg?url'
-import cursorIcon from '@/assets/tools/vscode1.svg?url'
-import JoyeIcon from '@/assets/link/Joye.png?url'
-//Joye哥的blog
-import links from '@/public/links.json'
+import { getLudusFriends, parseLinks } from '@/lib/links'
+import rawLinks from '@/public/links.json'
 
-import GuGuIcon from '@/assets/link/slime-happy-light.svg?url'
-//咕咕咕的blog
+import LudusCard from '@/components/links/LudusCard.astro'
+import { siteLink } from '@/site-config'
 
-import xzwIcon from '@/assets/link/xzw.png?url'
-//xzw的blog
-
-type FriendLink = {
-  name?: string
-  intro?: string
-  description?: string
-  desc?: string
-  link?: string
-}
-
-type CtaCard = {
-  className: string
-  href: string
-  label: string
-  icon: string
-  labelSide: 'left' | 'right'
-  preserveColor?: boolean
-  description?: string
-  linkKey?: string
-}
-
-const normalizeLinkKey = (value?: string) =>
-  (value ?? '').trim().replace(/\/$/, '').toLocaleLowerCase()
-
-const friendLinks = links.friends.flatMap((group) => group.link_list) as FriendLink[]
-
-const resolveDescription = (card: CtaCard) => {
-  const customDescription = card.description?.trim()
-  if (customDescription) return customDescription
-
-  const explicitKey = normalizeLinkKey(card.linkKey)
-  const hrefKey = normalizeLinkKey(card.href)
-  const labelKey = normalizeLinkKey(card.label)
-  const friend = friendLinks.find((item) => {
-    const nameKey = normalizeLinkKey(item.name)
-    const linkKey = normalizeLinkKey(item.link)
-
-    return (
-      (explicitKey && (explicitKey === nameKey || explicitKey === linkKey)) ||
-      (hrefKey && hrefKey === linkKey) ||
-      (labelKey && labelKey === nameKey)
-    )
-  })
-
-  return friend?.intro?.trim() || friend?.description?.trim() || friend?.desc?.trim()
-}
-
-const cards: CtaCard[] = [
-  {
-    className: 'im-cta-photo-1',
-    href: 'https://www.joyehuang.me/',
-    label: 'Joye',
-    icon: JoyeIcon,
-    labelSide: 'right',
-    preserveColor: true,
-    description: 'Joye 的个人网站，记录技术、生活和持续生长的灵感片段。'
-  },
-  {
-    className: 'im-cta-photo-2',
-    href: 'https://blog.cooingcode.space/',
-    label: '咕咕咕',
-    icon: GuGuIcon,
-    labelSide: 'left',
-    preserveColor: true,
-    description: '我是咕咕咕Cooing，全栈Agent开发工程师，底边键盘手，遨游星海的鸽子一只'
-    //dark模式是否反相
-  },
-  {
-    className: 'im-cta-photo-3',
-    href: 'https://www.arineko.xyz/',
-    label: 'ay4',
-    icon: xzwIcon,
-    labelSide: 'right',
-    preserveColor: true,
-    description:'我的产品也会梦见电子羊吗?'
-  },
-  {
-    className: 'im-cta-photo-4',
-    href: 'https://gemini.google.com',
-    label: 'Antigravity',
-    icon: devinIcon,
-    labelSide: 'left'
-  },
-  {
-    className: 'im-cta-photo-5',
-    href: 'https://gemini.google.com',
-    label: 'Gemini',
-    icon: geminiIcon,
-    labelSide: 'right'
-  },
-  {
-    className: 'im-cta-photo-6',
-    href: 'https://chatgpt.com/',
-    label: 'ChatGPT',
-    icon: grokIcon,
-    labelSide: 'left'
-  }
-]
-
-const cardsWithDescriptions = cards.map((card) => ({
-  ...card,
-  resolvedDescription: resolveDescription(card)
-}))
+const links = parseLinks(rawLinks)
+const cards = getLudusFriends(links)
 ---
 
-<section id='ludus-cta' class='im-section im-bottom-cta not-prose'>
-  <div class='im-bottom-cta-wrap'>
-    <div class='im-bottom-cta-media'>
-      {
-        cardsWithDescriptions.map((card) => (
-          <button
-            class={`im-cta-photo ${card.className} im-label-${card.labelSide}${card.preserveColor ? ' im-preserve-color' : ''}`}
-            type='button'
-            data-url={card.href}
-            aria-label={`Open ${card.label}`}
-          >
-            <img src={card.icon} alt='' class='im-cta-icon' loading='lazy' />
-            <span class='im-cta-tooltip'>
-              <span class='im-cta-label'>{card.label}</span>
-              {
-                card.resolvedDescription && (
-                  <span class='im-cta-description'>{card.resolvedDescription}</span>
-                )
-              }
-            </span>
-          </button>
-        ))
-      }
+<section id='ludus-cta' class='ludus-section not-prose' aria-label='精选友链'>
+  <div class='ludus-stage'>
+    {cards.map(({ friend, layout }) => <LudusCard friend={friend} layout={layout} />)}
 
-      <button
-        class='im-center-card'
-        type='button'
-        data-url='https://github.com/JoshuaChen2008'
-        aria-label='Open Joshua GitHub'
-      >
-        <img src={avatarIcon} alt='' class='im-cta-icon' loading='lazy' />
-        <span class='im-cta-tooltip'>
-          <span class='im-cta-label'>Joshua Chen</span>
-        </span>
-      </button>
-    </div>
+    <a class='ludus-center' href={siteLink.link} aria-label={`返回 ${siteLink.name} 首页`}>
+      <span class='ludus-center-surface'>
+        <img src='/images/avatar.webp' alt='' class='ludus-center-icon' width='88' height='88' />
+      </span>
+      <span class='ludus-center-label'>{siteLink.name}</span>
+    </a>
   </div>
 </section>
 
 <style>
-  .im-section {
-    width: 100%;
+  .ludus-section {
+    --ludus-card-bg: rgb(255 255 255 / 0.88);
+    --ludus-card-bg-hover: rgb(255 255 255 / 0.98);
+    --ludus-card-border: hsl(var(--border) / 0.76);
+    --ludus-card-border-hover: hsl(var(--foreground) / 0.2);
+    --ludus-card-shadow: rgb(15 23 42 / 0.14);
+    --ludus-card-shadow-hover: rgb(15 23 42 / 0.2);
+    --ludus-label-bg: rgb(255 255 255 / 0.94);
+    --ludus-label-color: #050506;
+    --ludus-label-border: hsl(var(--border) / 0.72);
+    --ludus-label-shadow: rgb(15 23 42 / 0.12);
+    position: relative;
+    min-height: 560px;
     margin: 1.5rem auto 0;
-    padding: 64px 0 56px;
+    overflow: hidden;
+    isolation: isolate;
   }
 
-  .im-bottom-cta {
-    --im-section-gradient: radial-gradient(
+  .ludus-section::before {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    content: '';
+    pointer-events: none;
+    background: radial-gradient(
       circle at 50% 50%,
       rgb(186 230 253 / 0.68) 0%,
       rgb(224 242 254 / 0.42) 22%,
       rgb(240 249 255 / 0.22) 42%,
       hsl(var(--background) / 1) 74%
     );
-    --im-card-bg: rgb(255 255 255 / 0.88);
-    --im-card-bg-hover: rgb(255 255 255 / 0.98);
-    --im-card-border: hsl(var(--border) / 0.76);
-    --im-card-border-hover: hsl(var(--foreground) / 0.2);
-    --im-card-shadow: rgb(15 23 42 / 0.14);
-    --im-card-shadow-hover: rgb(15 23 42 / 0.2);
-    --im-label-bg: rgb(255 255 255 / 0.94);
-    --im-label-color: #050506;
-    --im-label-border: hsl(var(--border) / 0.72);
-    --im-label-shadow: rgb(15 23 42 / 0.12);
-    position: relative;
-    z-index: 2;
-    min-height: 560px;
-    overflow: hidden;
-    isolation: isolate;
-    background: transparent;
-    padding-top: 72px;
-    padding-bottom: 96px;
-    border-radius: 0;
-  }
-
-  .im-bottom-cta::before {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    content: '';
-    background: var(--im-section-gradient);
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      transparent 0%,
-      #000 18%,
-      #000 82%,
-      transparent 100%
-    );
     mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
-    transition: background 0.35s ease;
   }
 
-  :global(.dark) .im-bottom-cta {
-    --im-section-gradient: radial-gradient(
+  :global(.dark) .ludus-section {
+    --ludus-card-bg: rgb(24 24 28 / 0.72);
+    --ludus-card-bg-hover: rgb(38 38 44 / 0.88);
+    --ludus-card-border: rgb(255 255 255 / 0.14);
+    --ludus-card-border-hover: rgb(255 255 255 / 0.28);
+    --ludus-card-shadow: rgb(0 0 0 / 0.34);
+    --ludus-card-shadow-hover: rgb(0 0 0 / 0.5);
+    --ludus-label-bg: rgb(20 20 24 / 0.92);
+    --ludus-label-color: hsl(var(--foreground));
+    --ludus-label-border: rgb(255 255 255 / 0.16);
+    --ludus-label-shadow: rgb(0 0 0 / 0.38);
+  }
+
+  :global(.dark) .ludus-section::before {
+    background: radial-gradient(
       circle at 50% 50%,
       rgb(255 255 255 / 0.18) 0%,
       rgb(125 211 252 / 0.13) 18%,
       rgb(14 40 62 / 0.52) 44%,
       hsl(var(--background) / 1) 78%
     );
-    --im-card-bg: rgb(24 24 28 / 0.72);
-    --im-card-bg-hover: rgb(38 38 44 / 0.88);
-    --im-card-border: rgb(255 255 255 / 0.14);
-    --im-card-border-hover: rgb(255 255 255 / 0.28);
-    --im-card-shadow: rgb(0 0 0 / 0.34);
-    --im-card-shadow-hover: rgb(0 0 0 / 0.5);
-    --im-label-bg: rgb(20 20 24 / 0.9);
-    --im-label-color: hsl(var(--foreground) / 0.96);
-    --im-label-border: rgb(255 255 255 / 0.16);
-    --im-label-shadow: rgb(0 0 0 / 0.38);
   }
 
-  .im-bottom-cta-wrap {
-    position: relative;
-    z-index: 1;
-    min-height: 392px;
-  }
-
-  .im-bottom-cta-media {
-    --im-mouse-x: 0;
-    --im-mouse-y: 0;
+  .ludus-stage {
+    --ludus-mouse-x: 0;
+    --ludus-mouse-y: 0;
     position: absolute;
-    inset: 0;
+    inset: 72px 0 96px;
     z-index: 1;
     max-width: 58rem;
     margin-inline: auto;
   }
 
-  .im-cta-photo,
-  .im-center-card {
+  .ludus-center {
     position: absolute;
-    display: grid;
-    place-items: center;
-    overflow: visible;
-    border: 1px solid var(--im-card-border);
-    /*1px                      边框粗细
-    solid                    实线
-    hsl(var(--border) / .76) 颜色和透明度，.76 越大越明显*/
-    background-color: var(--im-card-bg);
-    color: #050506;
-    cursor: pointer;
-    filter: drop-shadow(0 10px 14px var(--im-card-shadow));
-    transition:
-      transform 0.18s ease-out,
-      border-radius 0.35s ease,
-      filter 0.35s ease,
-      border-color 0.35s ease,
-      background-color 0.35s ease;
+    top: 50%;
+    left: 50%;
+    z-index: 5;
+    width: 88px;
+    height: 88px;
+    color: inherit;
+    outline: none;
+    transform: translate(-50%, -50%)
+      translate(calc(var(--ludus-mouse-x) * 6px), calc(var(--ludus-mouse-y) * 6px));
+    transition: transform 200ms ease-out;
   }
 
-  .im-cta-photo {
-    width: 96px;
-    height: 96px;
-    border-radius: 22px;
-    transform: translate(
-        calc(var(--im-mouse-x) * var(--im-px, 30px)),
-        calc(var(--im-mouse-y) * var(--im-py, 30px))
-      )
-      rotate(var(--im-rot, 0deg));
+  .ludus-center-surface {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid var(--ludus-card-border);
+    border-radius: 24px;
+    background: var(--ludus-card-bg);
+    filter: drop-shadow(0 12px 18px var(--ludus-card-shadow));
+    transition:
+      transform 200ms ease,
+      border-radius 220ms ease,
+      filter 220ms ease;
   }
-  /*修改方块内图片大小*/
-  .im-cta-icon {
+
+  .ludus-center:hover .ludus-center-surface,
+  .ludus-center:focus-visible .ludus-center-surface {
+    border-radius: 36px;
+    filter: drop-shadow(0 16px 26px var(--ludus-card-shadow-hover));
+    transform: scale(0.94);
+  }
+
+  .ludus-center:focus-visible .ludus-center-surface {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 4px;
+  }
+
+  .ludus-center-icon {
     width: 80%;
     height: 80%;
+    border-radius: 999px;
     object-fit: cover;
-    border-radius: 999px;
-    pointer-events: none;
-    transition: filter 0.35s ease;
   }
 
-  :global(.dark) .im-cta-photo:not(.im-preserve-color) .im-cta-icon {
-    filter: brightness(0) invert(1);
-  }
-
-  :global(.dark) .im-cta-photo.im-preserve-color .im-cta-icon {
-    filter: none;
-  }
-
-  .im-cta-tooltip {
+  .ludus-center-label {
     position: absolute;
-    top: 44%;
-    z-index: 4;
-    display: flex;
-    width: max-content;
-    max-width: min(14rem, calc(100vw - 2rem));
-    flex-direction: column;
-    gap: 0.38rem;
-    align-items: flex-start;
-    opacity: 0;
-    pointer-events: none;
-    visibility: hidden;
-    transition:
-      opacity 0.22s ease,
-      visibility 0s linear 0.22s,
-      transform 0.34s cubic-bezier(0.2, 0.9, 0.2, 1.25);
-  }
-
-  .im-cta-label {
-    width: max-content;
-    max-width: 8rem;
-    border: 1px solid var(--im-label-border);
-    border-radius: 999px;
-    background-color: var(--im-label-bg);
-    padding: 0.32rem 0.68rem;
-    color: var(--im-label-color);
-    font-size: 0.78rem;
-    font-weight: 500;
-    line-height: 1;
-    white-space: nowrap;
-    box-shadow: 0 10px 22px var(--im-label-shadow);
-  }
-
-  .im-cta-description {
-    max-width: min(14rem, calc(100vw - 2rem));
-    border: 1px solid var(--im-label-border);
-    border-radius: 8px;
-    background-color: var(--im-label-bg);
-    padding: 0.48rem 0.62rem;
-    color: var(--im-label-color);
-    font-size: 0.72rem;
-    font-weight: 400;
-    line-height: 1.45;
-    text-align: left;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-    box-shadow: 0 12px 26px var(--im-label-shadow);
-  }
-
-  .im-label-right .im-cta-tooltip {
-    left: calc(100% + 0.42rem);
-    transform: translate(-0.9rem, -58%) scale(0.86);
-    transform-origin: left center;
-  }
-
-  .im-label-left .im-cta-tooltip {
-    right: calc(100% + 0.42rem);
-    align-items: flex-end;
-    transform: translate(0.9rem, -58%) scale(0.86);
-    transform-origin: right center;
-  }
-
-  .im-center-card .im-cta-tooltip {
-    top: auto;
     bottom: calc(100% + 0.62rem);
     left: 50%;
-    align-items: center;
-    transform: translate(-50%, 0.9rem) scale(0.86);
-    transform-origin: center bottom;
+    width: max-content;
+    max-width: 12rem;
+    overflow: hidden;
+    border: 1px solid var(--ludus-label-border);
+    border-radius: 999px;
+    background: var(--ludus-label-bg);
+    padding: 0.34rem 0.68rem;
+    color: var(--ludus-label-color);
+    font-size: 0.78rem;
+    line-height: 1;
+    opacity: 0;
+    pointer-events: none;
+    text-overflow: ellipsis;
+    visibility: hidden;
+    white-space: nowrap;
+    box-shadow: 0 10px 22px var(--ludus-label-shadow);
+    transform: translate(-50%, 0.8rem) scale(0.9);
+    transition:
+      opacity 180ms ease,
+      visibility 0s linear 180ms,
+      transform 240ms ease-out;
   }
 
-  .im-cta-photo.is-hovered .im-cta-tooltip,
-  .im-center-card.is-hovered .im-cta-tooltip,
-  .im-cta-photo:focus-visible .im-cta-tooltip,
-  .im-center-card:focus-visible .im-cta-tooltip {
+  .ludus-center:hover .ludus-center-label,
+  .ludus-center:focus-visible .ludus-center-label {
     opacity: 1;
     visibility: visible;
+    transform: translate(-50%, -0.18rem) scale(1);
     transition-delay: 0s;
   }
 
-  .im-label-right.is-hovered .im-cta-tooltip,
-  .im-label-right:focus-visible .im-cta-tooltip {
-    transform: translate(0.18rem, -58%) scale(1);
-  }
-
-  .im-label-left.is-hovered .im-cta-tooltip,
-  .im-label-left:focus-visible .im-cta-tooltip {
-    transform: translate(-0.18rem, -58%) scale(1);
-  }
-
-  .im-center-card.is-hovered .im-cta-tooltip,
-  .im-center-card:focus-visible .im-cta-tooltip {
-    transform: translate(-50%, -0.18rem) scale(1);
-  }
-
-  .im-cta-photo.is-hovered,
-  .im-center-card.is-hovered {
-    border-color: var(--im-card-border-hover);
-    background-color: var(--im-card-bg-hover);
-    filter: drop-shadow(0 14px 22px var(--im-card-shadow-hover));
-  }
-
-  .im-cta-photo.is-hovered {
-    border-radius: 34px;
-  }
-
-  .im-cta-photo-1 {
-    --im-px: -60px;
-    --im-py: 40px;
-    --im-rot: 7deg;
-    top: 6%;
-    left: 16%;
-  }
-
-  .im-cta-photo-2 {
-    --im-px: 80px;
-    --im-py: -40px;
-    --im-rot: -8deg;
-    top: 7%;
-    right: 16%;
-  }
-
-  .im-cta-photo-3 {
-    --im-px: -35px;
-    --im-py: -50px;
-    --im-rot: -5deg;
-    top: 42%;
-    left: 8%;
-    width: 78px;
-    height: 78px;
-  }
-
-  .im-cta-photo-4 {
-    --im-px: 50px;
-    --im-py: 42px;
-    --im-rot: 7deg;
-    top: 48%;
-    right: 8%;
-    width: 78px;
-    height: 78px;
-  }
-
-  .im-cta-photo-5 {
-    --im-px: 62px;
-    --im-py: -62px;
-    --im-rot: -11deg;
-    left: 22%;
-    bottom: -10%;
-    width: 112px;
-    height: 112px;
-  }
-
-  .im-cta-photo-6 {
-    --im-px: -55px;
-    --im-py: 45px;
-    --im-rot: 12deg;
-    right: 22%;
-    bottom: -14%;
-    width: 112px;
-    height: 112px;
-  }
-
-  .im-center-card {
-    top: 50%;
-    left: 50%;
-    z-index: 3;
-    width: 88px;
-    height: 88px;
-    margin: -44px 0 0 -44px;
-    border-radius: 24px;
-    transform: translate(calc(var(--im-mouse-x) * 6px), calc(var(--im-mouse-y) * 6px));
-    transition:
-      transform 0.25s ease-out,
-      border-radius 0.35s ease,
-      filter 0.35s ease,
-      border-color 0.35s ease,
-      background-color 0.35s ease;
-  }
-
-  .im-center-card.is-hovered {
-    border-radius: 36px;
-    filter: drop-shadow(0 16px 26px var(--im-card-shadow-hover));
-  }
-
   @media (max-width: 768px) {
-    .im-section {
-      width: 100%;
-      padding: 56px 0;
-    }
-
-    .im-bottom-cta {
+    .ludus-section {
       min-height: 520px;
-      padding-bottom: 80px;
     }
 
-    .im-cta-photo-1 {
-      top: 30%;
-      left: -42px;
+    .ludus-stage {
+      inset: 56px 0 80px;
     }
 
-    .im-cta-photo-2 {
-      top: 30%;
-      right: -42px;
-    }
-
-    .im-cta-photo-3 {
-      top: 3%;
-      left: -10px;
-    }
-
-    .im-cta-photo-4 {
-      top: 4%;
-      right: -12px;
-    }
-
-    .im-cta-photo-5 {
-      left: -12px;
-      bottom: -18px;
-    }
-
-    .im-cta-photo-6 {
-      right: -12px;
-      bottom: -18px;
-    }
-
-    .im-center-card {
+    .ludus-center {
       width: 68px;
       height: 68px;
-      margin: -34px 0 0 -34px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ludus-center {
+      transform: translate(-50%, -50%);
+      transition: none;
     }
 
-    .im-cta-tooltip {
-      max-width: min(12rem, 72vw);
-      gap: 0.32rem;
-    }
-
-    .im-cta-label {
-      max-width: 7rem;
-      padding: 0.28rem 0.58rem;
-      font-size: 0.72rem;
-    }
-
-    .im-cta-description {
-      max-width: min(12rem, 72vw);
-      padding: 0.42rem 0.54rem;
-      font-size: 0.68rem;
-      line-height: 1.42;
+    .ludus-center-surface,
+    .ludus-center-label {
+      transition: none;
     }
   }
 </style>
 
-<script is:inline>
-  ;(() => {
-    const section = document.getElementById('ludus-cta')
-    const media = section?.querySelector('.im-bottom-cta-media')
+<script>
+  const section = document.querySelector<HTMLElement>('#ludus-cta')
+  const stage = section?.querySelector<HTMLElement>('.ludus-stage')
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 
-    if (!section || !media) return
-
+  if (section && stage && !reduceMotion.matches) {
     section.addEventListener('mousemove', (event) => {
       const rect = section.getBoundingClientRect()
-      media.style.setProperty('--im-mouse-x', ((event.clientX - rect.left) / rect.width) * 2 - 1)
-      media.style.setProperty('--im-mouse-y', ((event.clientY - rect.top) / rect.height) * 2 - 1)
+      stage.style.setProperty(
+        '--ludus-mouse-x',
+        String(((event.clientX - rect.left) / rect.width) * 2 - 1)
+      )
+      stage.style.setProperty(
+        '--ludus-mouse-y',
+        String(((event.clientY - rect.top) / rect.height) * 2 - 1)
+      )
     })
 
     section.addEventListener('mouseleave', () => {
-      media.style.setProperty('--im-mouse-x', '0')
-      media.style.setProperty('--im-mouse-y', '0')
+      stage.style.setProperty('--ludus-mouse-x', '0')
+      stage.style.setProperty('--ludus-mouse-y', '0')
     })
-
-    const allCards = media.querySelectorAll('.im-cta-photo, .im-center-card')
-
-    allCards.forEach((card) => {
-      card.addEventListener('click', () => {
-        const url = card.getAttribute('data-url')
-        if (url) window.open(url, '_blank', 'noopener,noreferrer')
-      })
-
-      card.addEventListener('mouseenter', () => {
-        const transform = getComputedStyle(card).transform
-        const matrix =
-          transform === 'none' ? new DOMMatrixReadOnly() : new DOMMatrixReadOnly(transform)
-        const angle = Math.atan2(matrix.m21, matrix.m11) * (180 / Math.PI)
-
-        card.style.transform = `translate(${matrix.m41.toFixed(1)}px, ${matrix.m42.toFixed(
-          1
-        )}px) rotate(${angle.toFixed(1)}deg) scale(0.92)`
-        card.classList.add('is-hovered')
-      })
-
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = ''
-        card.classList.remove('is-hovered')
-      })
-    })
-  })()
+  }
 </script>

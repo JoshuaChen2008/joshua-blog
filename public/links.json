@@ -2,19 +2,82 @@
   "friends": [
     {
       "id_name": "cf-links",
-      "desc": "Common links included in circle friends",
+      "desc": "Friends",
       "link_list": [
         {
           "name": "Arthals' ink",
-          "intro": "所见高山远木，阔云流风；所幸岁月盈余，了无拘束",
+          "desc": "所见高山远木，阔云流风；所幸岁月盈余，了无拘束",
           "link": "https://arthals.ink/",
           "avatar": "https://cdn.arthals.ink/Arthals.png"
         },
         {
           "name": "CWorld Site",
-          "intro": "求知若愚，虚怀若谷",
+          "desc": "求知若愚，虚怀若谷",
           "link": "https://cworld0.com/",
           "avatar": "https://cravatar.cn/avatar/1ffe42aa45a6b1444a786b1f32dfa8aa?s=200"
+        },
+        {
+          "name": "Joye",
+          "desc": "Joye 的个人网站，记录技术、生活和持续生长的灵感片段。",
+          "link": "https://www.joyehuang.me/",
+          "avatar": "/images/links/joye.png",
+          "ludus": {
+            "desktop": {
+              "x": 20,
+              "y": 18,
+              "size": 96
+            },
+            "mobile": {
+              "x": 0,
+              "y": 42,
+              "size": 96
+            },
+            "rotate": 7,
+            "parallaxX": -60,
+            "parallaxY": 40
+          }
+        },
+        {
+          "name": "咕咕咕",
+          "desc": "我是咕咕咕 Cooing，全栈 Agent 开发工程师，底边键盘手，遨游星海的鸽子一只。",
+          "link": "https://blog.cooingcode.space/",
+          "avatar": "/images/links/cooing.svg",
+          "ludus": {
+            "desktop": {
+              "x": 80,
+              "y": 18,
+              "size": 96
+            },
+            "mobile": {
+              "x": 100,
+              "y": 42,
+              "size": 96
+            },
+            "rotate": -8,
+            "parallaxX": 80,
+            "parallaxY": -40
+          }
+        },
+        {
+          "name": "ay4",
+          "desc": "我的产品也会梦见电子羊吗？",
+          "link": "https://www.arineko.xyz/",
+          "avatar": "/images/links/ay4.png",
+          "ludus": {
+            "desktop": {
+              "x": 12,
+              "y": 52,
+              "size": 78
+            },
+            "mobile": {
+              "x": 8,
+              "y": 12,
+              "size": 78
+            },
+            "rotate": -5,
+            "parallaxX": -35,
+            "parallaxY": -50
+          }
         }
       ]
     },
@@ -29,7 +92,7 @@
       "link_list": [
         {
           "name": "Astro",
-          "intro": "The web framework for content-driven websites",
+          "desc": "The web framework for content-driven websites",
           "link": "https://astro.build/",
           "avatar": "https://avatars.githubusercontent.com/u/44914786?s=200&v=4"
         }

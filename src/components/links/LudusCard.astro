@@ -1,0 +1,222 @@
+---
+import type { FriendLink, ResolvedLudusLayout } from '@/lib/links'
+
+import config from '@/site-config'
+
+interface Props {
+  friend: FriendLink
+  layout: ResolvedLudusLayout
+}
+
+const { friend, layout } = Astro.props
+const avatar =
+  (config.integ?.links?.cacheAvatar ?? false)
+    ? (friend.avatar_cache?.path ?? friend.avatar)
+    : friend.avatar
+const style = [
+  `--ludus-x:${layout.desktop.x}%`,
+  `--ludus-y:${layout.desktop.y}%`,
+  `--ludus-size:${layout.desktop.size}px`,
+  `--ludus-mobile-x:${layout.mobile.x}%`,
+  `--ludus-mobile-y:${layout.mobile.y}%`,
+  `--ludus-mobile-size:${layout.mobile.size}px`,
+  `--ludus-rotate:${layout.rotate}deg`,
+  `--ludus-parallax-x:${layout.parallaxX}px`,
+  `--ludus-parallax-y:${layout.parallaxY}px`,
+  `--ludus-z:${layout.zIndex}`
+].join(';')
+---
+
+<a
+  href={friend.link}
+  target='_blank'
+  rel='noopener noreferrer'
+  class:list={['ludus-card', `ludus-label-${layout.labelSide}`]}
+  style={style}
+  aria-label={`访问 ${friend.name}`}
+>
+  <span class='ludus-card-surface'>
+    <img
+      src={avatar}
+      alt=''
+      class='ludus-card-icon'
+      width={layout.desktop.size}
+      height={layout.desktop.size}
+      loading='lazy'
+      decoding='async'
+    />
+  </span>
+  <span class='ludus-tooltip'>
+    <span class='ludus-label'>{friend.name}</span>
+    <span class='ludus-description'>{friend.desc}</span>
+  </span>
+</a>
+
+<style>
+  .ludus-card {
+    position: absolute;
+    top: var(--ludus-y);
+    left: var(--ludus-x);
+    z-index: var(--ludus-z);
+    width: var(--ludus-size);
+    height: var(--ludus-size);
+    color: inherit;
+    outline: none;
+    transform: translate(-50%, -50%)
+      translate(
+        calc(var(--ludus-mouse-x, 0) * var(--ludus-parallax-x)),
+        calc(var(--ludus-mouse-y, 0) * var(--ludus-parallax-y))
+      )
+      rotate(var(--ludus-rotate));
+    transition: transform 180ms ease-out;
+  }
+
+  .ludus-card-surface {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid var(--ludus-card-border);
+    border-radius: 22px;
+    background: var(--ludus-card-bg);
+    filter: drop-shadow(0 10px 14px var(--ludus-card-shadow));
+    transition:
+      transform 200ms ease-out,
+      border-radius 220ms ease,
+      border-color 220ms ease,
+      background-color 220ms ease,
+      filter 220ms ease;
+  }
+
+  .ludus-card:hover .ludus-card-surface,
+  .ludus-card:focus-visible .ludus-card-surface {
+    border-color: var(--ludus-card-border-hover);
+    border-radius: 34px;
+    background: var(--ludus-card-bg-hover);
+    filter: drop-shadow(0 14px 22px var(--ludus-card-shadow-hover));
+    transform: scale(0.92);
+  }
+
+  .ludus-card:focus-visible .ludus-card-surface {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 4px;
+  }
+
+  .ludus-card-icon {
+    width: 80%;
+    height: 80%;
+    border-radius: 999px;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  .ludus-tooltip {
+    position: absolute;
+    top: 44%;
+    z-index: 10;
+    display: flex;
+    width: max-content;
+    max-width: min(14rem, calc(100vw - 2rem));
+    flex-direction: column;
+    gap: 0.38rem;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transition:
+      opacity 180ms ease,
+      visibility 0s linear 180ms,
+      transform 240ms ease-out;
+  }
+
+  .ludus-label,
+  .ludus-description {
+    border: 1px solid var(--ludus-label-border);
+    background: var(--ludus-label-bg);
+    color: var(--ludus-label-color);
+    box-shadow: 0 10px 22px var(--ludus-label-shadow);
+  }
+
+  .ludus-label {
+    width: max-content;
+    max-width: 9rem;
+    overflow: hidden;
+    border-radius: 999px;
+    padding: 0.34rem 0.68rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    line-height: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ludus-description {
+    max-width: min(14rem, calc(100vw - 2rem));
+    border-radius: 8px;
+    padding: 0.48rem 0.62rem;
+    font-size: 0.72rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  .ludus-label-right .ludus-tooltip {
+    left: calc(100% + 0.42rem);
+    align-items: flex-start;
+    transform: translate(-0.8rem, -58%) scale(0.9);
+    transform-origin: left center;
+  }
+
+  .ludus-label-left .ludus-tooltip {
+    right: calc(100% + 0.42rem);
+    align-items: flex-end;
+    transform: translate(0.8rem, -58%) scale(0.9);
+    transform-origin: right center;
+  }
+
+  .ludus-card:hover .ludus-tooltip,
+  .ludus-card:focus-visible .ludus-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  .ludus-label-right:hover .ludus-tooltip,
+  .ludus-label-right:focus-visible .ludus-tooltip {
+    transform: translate(0.18rem, -58%) scale(1);
+  }
+
+  .ludus-label-left:hover .ludus-tooltip,
+  .ludus-label-left:focus-visible .ludus-tooltip {
+    transform: translate(-0.18rem, -58%) scale(1);
+  }
+
+  @media (max-width: 768px) {
+    .ludus-card {
+      top: var(--ludus-mobile-y);
+      left: var(--ludus-mobile-x);
+      width: var(--ludus-mobile-size);
+      height: var(--ludus-mobile-size);
+    }
+
+    .ludus-tooltip {
+      max-width: min(12rem, 72vw);
+    }
+
+    .ludus-description {
+      max-width: min(12rem, 72vw);
+      font-size: 0.68rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ludus-card {
+      transform: translate(-50%, -50%) rotate(var(--ludus-rotate));
+      transition: none;
+    }
+
+    .ludus-card-surface,
+    .ludus-tooltip {
+      transition: none;
+    }
+  }
+</style>

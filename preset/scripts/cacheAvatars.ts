@@ -3,28 +3,8 @@ import { access, mkdir, readFile, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import type { FriendLink, LinksData } from '../../src/lib/links'
 import siteConfig from '../../src/site.config'
-
-type Friend = {
-  name: string
-  intro: string
-  link: string
-  avatar: string
-  avatar_cache?: {
-    hash: string
-    path: string
-  }
-}
-
-type FriendGroup = {
-  id_name: string
-  desc: string
-  link_list: Friend[]
-}
-
-type LinksJson = {
-  friends: FriendGroup[]
-}
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const projectRoot = path.resolve(__dirname, '../..')
@@ -106,7 +86,7 @@ async function fetchWithTimeout(url: string, ms: number) {
   }
 }
 
-async function cacheFriendAvatar(friend: Friend) {
+async function cacheFriendAvatar(friend: FriendLink) {
   if (!friend.avatar.trim().startsWith('http')) {
     // Local avatars are already bundled under public/
     const hadCache = Boolean(friend.avatar_cache)
@@ -164,7 +144,7 @@ async function cacheFriendAvatar(friend: Friend) {
 
 async function main() {
   const raw = await readFile(linksJsonPath, 'utf-8')
-  const links = JSON.parse(raw) as LinksJson
+  const links = JSON.parse(raw) as LinksData
 
   await mkdir(avatarOutputDir, { recursive: true })
 
