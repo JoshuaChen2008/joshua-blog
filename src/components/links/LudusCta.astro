@@ -121,6 +121,7 @@ const cards = getLudusFriends(links)
   }
 
   .ludus-center:hover .ludus-center-surface,
+  .ludus-center.is-hovered .ludus-center-surface,
   .ludus-center:focus-visible .ludus-center-surface {
     border-radius: 36px;
     filter: drop-shadow(0 16px 26px var(--ludus-card-shadow-hover));
@@ -167,6 +168,7 @@ const cards = getLudusFriends(links)
   }
 
   .ludus-center:hover .ludus-center-label,
+  .ludus-center.is-hovered .ludus-center-label,
   .ludus-center:focus-visible .ludus-center-label {
     opacity: 1;
     visibility: visible;
@@ -208,6 +210,8 @@ const cards = getLudusFriends(links)
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 
   if (section && stage && !reduceMotion.matches) {
+    const freezeHoverCards = stage.querySelectorAll<HTMLElement>('.ludus-card, .ludus-center')
+
     section.addEventListener('mousemove', (event) => {
       const rect = section.getBoundingClientRect()
       stage.style.setProperty(
@@ -223,6 +227,24 @@ const cards = getLudusFriends(links)
     section.addEventListener('mouseleave', () => {
       stage.style.setProperty('--ludus-mouse-x', '0')
       stage.style.setProperty('--ludus-mouse-y', '0')
+    })
+
+    freezeHoverCards.forEach((card) => {
+      card.addEventListener('mouseenter', () => {
+        const transform = getComputedStyle(card).transform
+
+        if (transform && transform !== 'none') {
+          const matrix = new DOMMatrixReadOnly(transform)
+          card.style.transform = `matrix(${matrix.a}, ${matrix.b}, ${matrix.c}, ${matrix.d}, ${matrix.e}, ${matrix.f})`
+        }
+
+        card.classList.add('is-hovered')
+      })
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = ''
+        card.classList.remove('is-hovered')
+      })
     })
   }
 </script>

@@ -90,6 +90,7 @@ const style = [
   }
 
   .ludus-card:hover .ludus-card-surface,
+  .ludus-card.is-hovered .ludus-card-surface,
   .ludus-card:focus-visible .ludus-card-surface {
     border-color: var(--ludus-card-border-hover);
     border-radius: 34px;
@@ -174,6 +175,7 @@ const style = [
   }
 
   .ludus-card:hover .ludus-tooltip,
+  .ludus-card.is-hovered .ludus-tooltip,
   .ludus-card:focus-visible .ludus-tooltip {
     opacity: 1;
     visibility: visible;
@@ -181,11 +183,13 @@ const style = [
   }
 
   .ludus-label-right:hover .ludus-tooltip,
+  .ludus-label-right.is-hovered .ludus-tooltip,
   .ludus-label-right:focus-visible .ludus-tooltip {
     transform: translate(0.18rem, -58%) scale(1);
   }
 
   .ludus-label-left:hover .ludus-tooltip,
+  .ludus-label-left.is-hovered .ludus-tooltip,
   .ludus-label-left:focus-visible .ludus-tooltip {
     transform: translate(-0.18rem, -58%) scale(1);
   }
