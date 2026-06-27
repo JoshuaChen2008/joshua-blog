@@ -1,5 +1,6 @@
 ---
 // 首页开屏入场动画（纯视觉遮罩，不依赖第三方 Header）。
+// 药丸上移时背景/边框/阴影逐渐淡为透明并“融化”成真实导航栏（位置天然对齐）。
 ---
 <div id='intro-overlay' aria-hidden='true'>
   <div id='intro-bg'></div>
@@ -7,9 +8,7 @@
     <div id='intro-glow'></div>
     <div id='intro-title'>Joshua's Blog</div>
     <div id='intro-pill'>
-      <span id='intro-brand'>Joshua's Blog</span>
       <span id='intro-welcome'>Welcome to explore my blog.</span>
-      <span id='intro-menu'>About&nbsp;&nbsp;Blog</span>
     </div>
   </div>
 </div>
@@ -48,17 +47,18 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    width: min(90vw, 640px);
-    height: 42vh;
-    transform: translate(-50%, -50%) scale(0.6);
+    width: min(112vw, 900px);
+    height: 60vh;
+    transform: translate(-50%, -50%) scale(0.7);
     opacity: 0;
     border-radius: 50%;
-    filter: blur(34px);
+    filter: blur(58px);
     background: radial-gradient(
       ellipse at center,
-      rgba(101, 158, 185, 0.92),
-      rgba(101, 158, 185, 0.3) 45%,
-      rgba(101, 158, 185, 0) 70%
+      rgba(101, 158, 185, 0.5),
+      rgba(101, 158, 185, 0.24) 38%,
+      rgba(101, 158, 185, 0.08) 62%,
+      rgba(101, 158, 185, 0) 80%
     );
     transition:
       top 1.15s ease,
@@ -71,7 +71,7 @@
   #intro-title {
     position: absolute;
     left: 50%;
-    top: calc(50% - 64px);
+    top: calc(50% - 68px);
     transform: translateX(-50%);
     font-size: 1.5rem;
     font-weight: 500;
@@ -86,9 +86,9 @@
   #intro-pill {
     position: absolute;
     left: 50%;
-    top: calc(50% - 27px);
-    width: min(86vw, 320px);
-    height: 54px;
+    top: calc(50% - 28px);
+    width: min(86vw, 340px);
+    height: 56px;
     transform: translateX(-50%) scale(0.94);
     opacity: 0;
     transform-origin: center;
@@ -96,8 +96,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 24px;
-    border-radius: 1rem;
+    padding: 0 28px;
+    border-radius: 999px;
     border: 1px solid hsl(var(--border));
     background: hsl(var(--background));
     box-shadow:
@@ -108,31 +108,12 @@
       opacity 0.5s ease,
       transform 0.8s cubic-bezier(0.45, 0.05, 0.2, 1);
   }
-  #intro-brand {
-    position: absolute;
-    left: 0.75rem;
-    font-size: 1.25rem;
-    font-weight: 500;
-    color: hsl(var(--foreground));
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
   #intro-welcome {
     font-size: 1rem;
     font-weight: 500;
     color: hsl(var(--foreground));
     white-space: nowrap;
     transition: opacity 0.22s ease;
-  }
-  #intro-menu {
-    position: absolute;
-    right: 0.75rem;
-    font-size: 0.95rem;
-    color: hsl(var(--muted-foreground));
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.4s ease;
   }
   @keyframes introNavJelly {
     0% {
@@ -154,9 +135,17 @@
   html.intro-playing {
     overflow: hidden;
   }
+  html.intro-playing header-component,
+  html.intro-navready header-component {
+    transition: opacity 0.5s ease !important;
+  }
   html.intro-playing header-component {
     opacity: 0;
     pointer-events: none;
+  }
+  html.intro-navready header-component {
+    opacity: 1;
+    pointer-events: auto;
   }
   html.intro-playing main,
   html.intro-playing #main-container > :last-child {
@@ -180,12 +169,12 @@
   const glow = document.getElementById('intro-glow') as HTMLElement
   const title = document.getElementById('intro-title') as HTMLElement
   const pill = document.getElementById('intro-pill') as HTMLElement
-  const brand = document.getElementById('intro-brand') as HTMLElement
   const welcome = document.getElementById('intro-welcome') as HTMLElement
-  const menu = document.getElementById('intro-menu') as HTMLElement
 
   const SESSION_KEY = 'introPlayed'
   const SKIP_EVENTS = ['wheel', 'keydown', 'click', 'touchstart']
+  const PILL_SHADOW =
+    'rgba(24, 24, 27, 0.08) 0 0 0 1px, rgba(39, 39, 42, 0.08) 0 10px 15px -3px, rgba(39, 39, 42, 0.08) 0 4px 6px -4px'
   let timers: number[] = []
   let running = false
 
@@ -209,42 +198,39 @@
     clearAll()
     pill.style.animation = 'none'
     pill.style.transition = 'opacity .5s ease, transform .8s cubic-bezier(.45,.05,.2,1)'
+    pill.style.background = 'hsl(var(--background))'
+    pill.style.borderColor = 'hsl(var(--border))'
+    pill.style.boxShadow = PILL_SHADOW
     overlay.style.display = 'block'
     overlay.style.transition = ''
     overlay.style.opacity = '1'
     bg.style.opacity = '1'
-    root.classList.remove('intro-revealing')
+    root.classList.remove('intro-revealing', 'intro-navready')
     root.classList.add('intro-playing')
     glow.style.opacity = '0'
     glow.style.top = '50%'
-    glow.style.width = 'min(90vw,640px)'
-    glow.style.height = '42vh'
-    glow.style.transform = 'translate(-50%,-50%) scale(.6)'
-    glow.style.filter = 'blur(34px)'
+    glow.style.width = 'min(112vw,900px)'
+    glow.style.height = '60vh'
+    glow.style.transform = 'translate(-50%,-50%) scale(.7)'
+    glow.style.filter = 'blur(58px)'
     title.style.opacity = '0'
-    title.style.top = 'calc(50% - 64px)'
+    title.style.top = 'calc(50% - 68px)'
     pill.style.opacity = '0'
-    pill.style.top = 'calc(50% - 27px)'
-    pill.style.width = 'min(86vw,320px)'
-    pill.style.height = '54px'
+    pill.style.top = 'calc(50% - 28px)'
+    pill.style.width = 'min(86vw,340px)'
+    pill.style.height = '56px'
     pill.style.transform = 'translateX(-50%) scale(.94)'
-    pill.style.borderRadius = '1rem'
-    pill.style.padding = '0 24px'
+    pill.style.borderRadius = '999px'
+    pill.style.padding = '0 28px'
     welcome.style.opacity = '1'
-    brand.style.opacity = '0'
-    menu.style.opacity = '0'
   }
 
   function finish() {
     running = false
     clearAll()
     removeSkip()
-    root.classList.remove('intro-playing', 'intro-revealing')
-    overlay.style.transition = 'opacity .18s ease'
-    overlay.style.opacity = '0'
-    window.setTimeout(() => {
-      overlay.style.display = 'none'
-    }, 220)
+    root.classList.remove('intro-playing', 'intro-revealing', 'intro-navready')
+    overlay.style.display = 'none'
     try {
       sessionStorage.setItem(SESSION_KEY, '1')
     } catch (e) {}
@@ -263,45 +249,53 @@
         pill.style.transform = 'translateX(-50%) scale(1)'
 
         add(700, () => {
-          glow.style.transform = 'translate(-50%,-50%) scale(1.05)'
+          glow.style.transform = 'translate(-50%,-50%) scale(1.04)'
         })
 
+        // ③ 沿直线上移 + 对称展开（保留背景/边框，便于看清变形与回弹）
         add(1650, () => {
           pill.style.transition =
             'top .42s cubic-bezier(.33,0,.25,1), width .42s cubic-bezier(.33,0,.25,1), height .42s ease, border-radius .42s ease, padding .42s ease'
           welcome.style.opacity = '0'
           title.style.opacity = '0'
-          title.style.top = 'calc(50% - 96px)'
+          title.style.top = 'calc(50% - 100px)'
           pill.style.top = '1rem'
           pill.style.width = '100%'
           pill.style.height = '3rem'
-          pill.style.borderRadius = '.75rem'
-          pill.style.padding = '0 .5rem'
+          pill.style.borderRadius = '.875rem'
+          pill.style.padding = '0 .75rem'
           glow.style.top = '0'
-          glow.style.height = '46vh'
-          glow.style.width = '150%'
-          glow.style.transform = 'translate(-50%,-46%) scale(1)'
-          glow.style.filter = 'blur(44px)'
+          glow.style.height = '52vh'
+          glow.style.width = '170%'
+          glow.style.transform = 'translate(-50%,-44%) scale(1)'
+          glow.style.filter = 'blur(64px)'
           glow.style.opacity = '0'
           bg.style.opacity = '0'
+          // 内容随上移同步从下往上渐显
           root.classList.add('intro-revealing')
         })
 
-        add(1650 + 230, () => {
-          brand.style.opacity = '1'
-          menu.style.opacity = '1'
-        })
-
-        add(1650 + 390, () => {
+        // ④ 到顶瞬间单次水滴回弹
+        add(1650 + 400, () => {
           void pill.offsetWidth
           pill.style.animation = 'introNavJelly .4s cubic-bezier(.3,.6,.3,1)'
         })
 
-        add(1650 + 390 + 440, () => {
+        // ⑤ 回弹后：背景/边框/阴影淡为透明，露出真实导航栏（对齐）+ 内容渐显
+        add(1650 + 400 + 420, () => {
           pill.style.animation = 'none'
           pill.style.transform = 'translateX(-50%) scale(1)'
-          finish()
+          pill.style.transition =
+            'background .35s ease, border-color .35s ease, box-shadow .35s ease'
+          pill.style.background = 'transparent'
+          pill.style.borderColor = 'transparent'
+          pill.style.boxShadow = 'none'
+          // 药丸背景淡透的同时，真实导航栏对齐显现
+          root.classList.add('intro-navready')
         })
+
+        // ✓ 收尾移除遮罩
+        add(1650 + 400 + 420 + 420, finish)
       })
     )
   }
