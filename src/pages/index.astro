@@ -7,6 +7,7 @@ import { getBlogCollection, sortMDByDate } from 'astro-pure/server'
 import { Button, Card, Icon, Label } from 'astro-pure/user'
 import PageLayout from '@/layouts/BaseLayout.astro'
 import IntroAnimation from '@/components/home/IntroAnimation.astro'
+import IntroReplayButton from '@/components/home/IntroReplayButton.astro'
 import Section from '@/components/home/Section.astro'
 import SkillLayout from '@/components/home/SkillLayout.astro'
 import config from '@/site-config'
@@ -41,6 +42,7 @@ if (!images[imagePath])
 
 <PageLayout meta={{ title: 'Home' }} highlightColor='#659EB9'>
   <IntroAnimation />
+  <IntroReplayButton />
   <main class='flex w-full flex-col items-center'>
     <section class='animate mb-10 flex flex-col items-center gap-y-7' id='content-header'>
       <Image

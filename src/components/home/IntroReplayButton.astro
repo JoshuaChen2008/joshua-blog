@@ -1,0 +1,36 @@
+---
+// TEMP（开发用）：左下角回放开屏动画按钮。
+// 删除方式：删掉本文件，并移除 index.astro 中对应的 import 与 <IntroReplayButton /> 即可，零残留。
+---
+<button id='intro-replay-btn' type='button' aria-label='回放开屏动画'>↻ 回放开屏</button>
+
+<style>
+  #intro-replay-btn {
+    position: fixed;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 120;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.8rem;
+    border-radius: 0.6rem;
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    box-shadow: 0 4px 10px -4px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    opacity: 0.85;
+    transition: opacity 0.2s ease;
+  }
+  #intro-replay-btn:hover {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  document.getElementById('intro-replay-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation()
+    const w = window as any
+    if (typeof w.__replayIntro === 'function') w.__replayIntro()
+    else window.dispatchEvent(new CustomEvent('intro:replay'))
+  })
+</script>
