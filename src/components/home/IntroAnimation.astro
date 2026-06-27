@@ -19,6 +19,8 @@
     inset: 0;
     z-index: 100;
     pointer-events: none;
+    /* 默认隐藏；仅在确实要播放时（头部门控已在首屏前加上 intro-playing）才显示，避免刷新白屏/白闪 */
+    display: none;
   }
   #intro-bg {
     position: absolute;
@@ -132,8 +134,8 @@
 </style>
 
 <style is:global>
-  html.intro-playing {
-    overflow: hidden;
+  html.intro-playing #intro-overlay {
+    display: block;
   }
   html.intro-playing header-component,
   html.intro-navready header-component {
@@ -285,12 +287,12 @@
         add(1650 + 400 + 420, () => {
           pill.style.animation = 'none'
           pill.style.transform = 'translateX(-50%) scale(1)'
+          // 回弹结束后：背景/边框/阴影一起化开，真实导航栏对齐显现
           pill.style.transition =
             'background .35s ease, border-color .35s ease, box-shadow .35s ease'
           pill.style.background = 'transparent'
           pill.style.borderColor = 'transparent'
           pill.style.boxShadow = 'none'
-          // 药丸背景淡透的同时，真实导航栏对齐显现
           root.classList.add('intro-navready')
         })
 
@@ -309,4 +311,5 @@
   window.addEventListener('intro:replay', () => (window as any).__replayIntro())
 
   if (root.classList.contains('intro-playing')) play()
+  else overlay.style.display = 'none'
 </script>
