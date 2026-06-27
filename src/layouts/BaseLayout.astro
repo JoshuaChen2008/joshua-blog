@@ -33,6 +33,16 @@ const highlightGradientClass =
   <head>
     <BaseHead {articleDate} {description} {ogImage} {title} />
     <ThemeProvider />
+    <script is:inline>
+      ;(function () {
+        try {
+          if (location.pathname !== '/') return
+          var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          var played = sessionStorage.getItem('introPlayed') === '1'
+          if (!rm && !played) document.documentElement.classList.add('intro-playing')
+        } catch (e) {}
+      })()
+    </script>
   </head>
 
   <body class='flex justify-center bg-background text-foreground' {...props}>

@@ -1,0 +1,174 @@
+---
+// 首页开屏入场动画（纯视觉遮罩，不依赖第三方 Header）。
+---
+<div id='intro-overlay' aria-hidden='true'>
+  <div id='intro-bg'></div>
+  <div class='intro-inner'>
+    <div id='intro-glow'></div>
+    <div id='intro-title'>Joshua's Blog</div>
+    <div id='intro-pill'>
+      <span id='intro-brand'>Joshua's Blog</span>
+      <span id='intro-welcome'>Welcome to explore my blog.</span>
+      <span id='intro-menu'>About&nbsp;&nbsp;Blog</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  #intro-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+  }
+  #intro-bg {
+    position: absolute;
+    inset: 0;
+    background: hsl(var(--background));
+    transition: opacity 0.9s ease;
+  }
+  .intro-inner {
+    position: relative;
+    height: 100%;
+    max-width: 70rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 640px) {
+    .intro-inner {
+      padding-inline: 1.75rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .intro-inner {
+      padding-inline: 2.5rem;
+    }
+  }
+  #intro-glow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(90vw, 640px);
+    height: 42vh;
+    transform: translate(-50%, -50%) scale(0.6);
+    opacity: 0;
+    border-radius: 50%;
+    filter: blur(34px);
+    background: radial-gradient(
+      ellipse at center,
+      rgba(101, 158, 185, 0.92),
+      rgba(101, 158, 185, 0.3) 45%,
+      rgba(101, 158, 185, 0) 70%
+    );
+    transition:
+      top 1.15s ease,
+      width 1.15s ease,
+      height 1.15s ease,
+      transform 1.15s ease,
+      opacity 1.15s ease,
+      filter 1.15s ease;
+  }
+  #intro-title {
+    position: absolute;
+    left: 50%;
+    top: calc(50% - 64px);
+    transform: translateX(-50%);
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    color: hsl(var(--foreground));
+    white-space: nowrap;
+    opacity: 0;
+    transition:
+      opacity 0.45s ease,
+      top 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  #intro-pill {
+    position: absolute;
+    left: 50%;
+    top: calc(50% - 27px);
+    width: min(86vw, 320px);
+    height: 54px;
+    transform: translateX(-50%) scale(0.94);
+    opacity: 0;
+    transform-origin: center;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 24px;
+    border-radius: 1rem;
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--background));
+    box-shadow:
+      rgba(24, 24, 27, 0.08) 0 0 0 1px,
+      rgba(39, 39, 42, 0.08) 0 10px 15px -3px,
+      rgba(39, 39, 42, 0.08) 0 4px 6px -4px;
+    transition:
+      opacity 0.5s ease,
+      transform 0.8s cubic-bezier(0.45, 0.05, 0.2, 1);
+  }
+  #intro-brand {
+    position: absolute;
+    left: 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: hsl(var(--foreground));
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  #intro-welcome {
+    font-size: 1rem;
+    font-weight: 500;
+    color: hsl(var(--foreground));
+    white-space: nowrap;
+    transition: opacity 0.22s ease;
+  }
+  #intro-menu {
+    position: absolute;
+    right: 0.75rem;
+    font-size: 0.95rem;
+    color: hsl(var(--muted-foreground));
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  @keyframes introNavJelly {
+    0% {
+      transform: translateX(-50%) scale(1, 1);
+    }
+    35% {
+      transform: translateX(-50%) scale(1.02, 0.83);
+    }
+    70% {
+      transform: translateX(-50%) scale(0.99, 1.06);
+    }
+    100% {
+      transform: translateX(-50%) scale(1, 1);
+    }
+  }
+</style>
+
+<style is:global>
+  html.intro-playing {
+    overflow: hidden;
+  }
+  html.intro-playing header-component {
+    opacity: 0;
+    pointer-events: none;
+  }
+  html.intro-playing main,
+  html.intro-playing #main-container > :last-child {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  html.intro-revealing main,
+  html.intro-revealing #main-container > :last-child {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.8s ease,
+      transform 0.8s ease;
+  }
+</style>
