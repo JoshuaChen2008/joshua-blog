@@ -74,7 +74,17 @@
 - **不引入动画库**：纯原生 CSS keyframes + transition + 少量内联 JS，零额外依赖。
 - **不修改 `node_modules`**：所有改动集中在 `src/components/home/IntroAnimation.astro`、`src/pages/index.astro`，必要时在 `src/assets/styles` 增补少量样式。
 
-## 8. 范围之外（YAGNI）
+## 8. 临时回放按钮（开发用，可一键删除）
+
+为方便开发期反复检查效果（不必反复刷新 / 清 `sessionStorage`），增加一个**临时**的回放按钮：
+
+- 独立组件：`src/components/home/IntroReplayButton.astro`，与主功能解耦，删除该组件文件 + 在 `index.astro` 移除其引入即可彻底移除，不影响入场动画本身。
+- 位置：页面**左下角**固定一个小按钮（fixed，左下，较高 z-index）。
+- 行为：点击后重新播放开屏入场动画——即重置并重跑 `IntroAnimation` 的时间线（无需刷新页面，也不依赖 `sessionStorage`）。
+- 实现方式：`IntroAnimation` 暴露一个可重新触发的入口（例如挂在 `window` 上的 `window.__replayIntro()`，或派发自定义事件 `intro:replay`），回放按钮调用它。这样回放按钮只依赖该约定接口，删除时不会留下耦合。
+- 仅作开发用途，正式上线前应移除（在文档与代码注释中标注 TEMP / 开发用）。
+
+## 9. 范围之外（YAGNI）
 
 - 不在非首页路由播放。
 - 不做可配置的多套主题/文案后台。
