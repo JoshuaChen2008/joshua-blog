@@ -172,3 +172,147 @@
       transform 0.8s ease;
   }
 </style>
+
+<script>
+  const root = document.documentElement
+  const overlay = document.getElementById('intro-overlay') as HTMLElement
+  const bg = document.getElementById('intro-bg') as HTMLElement
+  const glow = document.getElementById('intro-glow') as HTMLElement
+  const title = document.getElementById('intro-title') as HTMLElement
+  const pill = document.getElementById('intro-pill') as HTMLElement
+  const brand = document.getElementById('intro-brand') as HTMLElement
+  const welcome = document.getElementById('intro-welcome') as HTMLElement
+  const menu = document.getElementById('intro-menu') as HTMLElement
+
+  const SESSION_KEY = 'introPlayed'
+  const SKIP_EVENTS = ['wheel', 'keydown', 'click', 'touchstart']
+  let timers: number[] = []
+  let running = false
+
+  const add = (ms: number, fn: () => void) => timers.push(window.setTimeout(fn, ms))
+  const clearAll = () => {
+    timers.forEach((t) => clearTimeout(t))
+    timers = []
+  }
+
+  function onSkip() {
+    if (running) finish()
+  }
+  function addSkip() {
+    SKIP_EVENTS.forEach((ev) => window.addEventListener(ev, onSkip, { passive: true }))
+  }
+  function removeSkip() {
+    SKIP_EVENTS.forEach((ev) => window.removeEventListener(ev, onSkip))
+  }
+
+  function resetVisual() {
+    clearAll()
+    pill.style.animation = 'none'
+    pill.style.transition = 'opacity .5s ease, transform .8s cubic-bezier(.45,.05,.2,1)'
+    overlay.style.display = 'block'
+    overlay.style.transition = ''
+    overlay.style.opacity = '1'
+    bg.style.opacity = '1'
+    root.classList.remove('intro-revealing')
+    root.classList.add('intro-playing')
+    glow.style.opacity = '0'
+    glow.style.top = '50%'
+    glow.style.width = 'min(90vw,640px)'
+    glow.style.height = '42vh'
+    glow.style.transform = 'translate(-50%,-50%) scale(.6)'
+    glow.style.filter = 'blur(34px)'
+    title.style.opacity = '0'
+    title.style.top = 'calc(50% - 64px)'
+    pill.style.opacity = '0'
+    pill.style.top = 'calc(50% - 27px)'
+    pill.style.width = 'min(86vw,320px)'
+    pill.style.height = '54px'
+    pill.style.transform = 'translateX(-50%) scale(.94)'
+    pill.style.borderRadius = '1rem'
+    pill.style.padding = '0 24px'
+    welcome.style.opacity = '1'
+    brand.style.opacity = '0'
+    menu.style.opacity = '0'
+  }
+
+  function finish() {
+    running = false
+    clearAll()
+    removeSkip()
+    root.classList.remove('intro-playing', 'intro-revealing')
+    overlay.style.transition = 'opacity .18s ease'
+    overlay.style.opacity = '0'
+    window.setTimeout(() => {
+      overlay.style.display = 'none'
+    }, 220)
+    try {
+      sessionStorage.setItem(SESSION_KEY, '1')
+    } catch (e) {}
+  }
+
+  function play() {
+    running = true
+    resetVisual()
+    addSkip()
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        glow.style.opacity = '1'
+        glow.style.transform = 'translate(-50%,-50%) scale(1)'
+        title.style.opacity = '1'
+        pill.style.opacity = '1'
+        pill.style.transform = 'translateX(-50%) scale(1)'
+
+        add(700, () => {
+          glow.style.transform = 'translate(-50%,-50%) scale(1.05)'
+        })
+
+        add(1650, () => {
+          pill.style.transition =
+            'top .42s cubic-bezier(.33,0,.25,1), width .42s cubic-bezier(.33,0,.25,1), height .42s ease, border-radius .42s ease, padding .42s ease'
+          welcome.style.opacity = '0'
+          title.style.opacity = '0'
+          title.style.top = 'calc(50% - 96px)'
+          pill.style.top = '1rem'
+          pill.style.width = '100%'
+          pill.style.height = '3rem'
+          pill.style.borderRadius = '.75rem'
+          pill.style.padding = '0 .5rem'
+          glow.style.top = '0'
+          glow.style.height = '46vh'
+          glow.style.width = '150%'
+          glow.style.transform = 'translate(-50%,-46%) scale(1)'
+          glow.style.filter = 'blur(44px)'
+          glow.style.opacity = '0'
+          bg.style.opacity = '0'
+          root.classList.add('intro-revealing')
+        })
+
+        add(1650 + 230, () => {
+          brand.style.opacity = '1'
+          menu.style.opacity = '1'
+        })
+
+        add(1650 + 390, () => {
+          void pill.offsetWidth
+          pill.style.animation = 'introNavJelly .4s cubic-bezier(.3,.6,.3,1)'
+        })
+
+        add(1650 + 390 + 440, () => {
+          pill.style.animation = 'none'
+          pill.style.transform = 'translateX(-50%) scale(1)'
+          finish()
+        })
+      })
+    )
+  }
+
+  ;(window as any).__replayIntro = function () {
+    running = false
+    clearAll()
+    removeSkip()
+    play()
+  }
+  window.addEventListener('intro:replay', () => (window as any).__replayIntro())
+
+  if (root.classList.contains('intro-playing')) play()
+</script>
