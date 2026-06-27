@@ -2,7 +2,7 @@
 // TEMP（开发用）：左下角回放开屏动画按钮。
 // 删除方式：删掉本文件，并移除 index.astro 中对应的 import 与 <IntroReplayButton /> 即可，零残留。
 ---
-<button id='intro-replay-btn' type='button' aria-label='回放开屏动画'>↻ 回放开屏</button>
+<button id='intro-replay-btn' type='button' aria-label='回放开屏动画' title='回放开屏动画'>↻</button>
 
 <style>
   #intro-replay-btn {
@@ -10,9 +10,15 @@
     left: 1rem;
     bottom: 1rem;
     z-index: 120;
-    padding: 0.4rem 0.7rem;
-    font-size: 0.8rem;
-    border-radius: 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    font-size: 1.1rem;
+    line-height: 1;
+    border-radius: 999px;
     border: 1px solid hsl(var(--border));
     background: hsl(var(--background));
     color: hsl(var(--foreground));

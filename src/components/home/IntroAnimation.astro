@@ -1,14 +1,44 @@
 ---
 // 首页开屏入场动画（纯视觉遮罩，不依赖第三方 Header）。
-// 药丸上移时背景/边框/阴影逐渐淡为透明并“融化”成真实导航栏（位置天然对齐）。
+// 上移途中实心条化为液态玻璃环；药丸自身渲染真实导航栏内容（读 config，与 Header 对齐），
+// 玻璃消散后即“纯文字导航栏”，收尾与真实 Header 无缝替换。
+import config from '@/site-config'
+import { Icon } from 'astro-pure/user'
 ---
+{/*
+  【A 方案特有 · 背景光层】渐变 + 光晕。
+  组件渲染在 #main-container 内（slot 里），此处它天生是 #main-container 的子孙；
+  下方脚本会在初始化时用 insertBefore 把这个节点“搬”到 body 层、#main-container 之前，
+  让蓝光真正落到内容之下（详见 script 中的搬运逻辑）。模板里它仍写在组件内 → 自包含、可一键删除。
+*/}
+<div id='intro-backdrop' aria-hidden='true'>
+  <div id='intro-grad'></div>
+  <div id='intro-glow'></div>
+</div>
+{/* 前景层：药丸（变形中的导航栏）+ 标题，仍压在内容之上（z-100） */}
 <div id='intro-overlay' aria-hidden='true'>
-  <div id='intro-bg'></div>
   <div class='intro-inner'>
-    <div id='intro-glow'></div>
     <div id='intro-title'>Joshua's Blog</div>
     <div id='intro-pill'>
+      <a id='intro-brand' href='/'>{config.title}</a>
       <span id='intro-welcome'>Welcome to explore my blog.</span>
+      <div id='intro-nav' class='flex items-center gap-x-2'>
+        <div class='flex items-center'>
+          {
+            config.header.menu?.map((item) => (
+              <span class='px-3 py-2 font-medium'>{item.title}</span>
+            ))
+          }
+          <span class='px-2 py-2'>
+            <Icon name='search' class='size-5' />
+          </span>
+        </div>
+        <div class='flex gap-x-4'>
+          <span class='box-content size-5 rounded-md border p-1.5'>
+            <Icon name='computer' class='size-5' />
+          </span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -22,28 +52,35 @@
     /* 默认隐藏；仅在确实要播放时（头部门控已在首屏前加上 intro-playing）才显示，避免刷新白屏/白闪 */
     display: none;
   }
-  #intro-bg {
+  /* 【A 方案特有 · 背景光层容器】
+     z-index:-1 让它落在内容（#main-container，普通流，绘制层级更高）之下、body 底色之上——
+     这是“蓝光永不染色内容”的关键。注意：必须靠脚本把本节点搬到 body 层才生效，
+     因为子孙元素无论 z-index 多低都画不到祖先 #main-container 之下。
+     默认 display:none，仅 intro-playing 时显示，避免刷新白闪。 */
+  #intro-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    display: none;
+  }
+  /* 与真实 #highlight-gradient 完全一致：同样的 linear-gradient(#659EB9,transparent) 配 0.25 不透明度，
+     避免结尾接管时渐变中段深浅不一造成的“变深再变回”割裂感。淡入目标 opacity = 0.25（由 JS 设置）。 */
+  #intro-grad {
     position: absolute;
     inset: 0;
-    background: hsl(var(--background));
-    transition: opacity 0.9s ease;
+    background: linear-gradient(#659eb9, transparent);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease;
   }
   .intro-inner {
-    position: relative;
+    /* 默认居中作兜底；运行时由 JS 量出真实 Header 的几何并精确覆盖 left/width */
+    position: absolute;
+    inset: 0;
     height: 100%;
     max-width: 70rem;
     margin-inline: auto;
-    padding-inline: 1rem;
-  }
-  @media (min-width: 640px) {
-    .intro-inner {
-      padding-inline: 1.75rem;
-    }
-  }
-  @media (min-width: 1024px) {
-    .intro-inner {
-      padding-inline: 2.5rem;
-    }
   }
   #intro-glow {
     position: absolute;
@@ -111,11 +148,38 @@
       transform 0.8s cubic-bezier(0.45, 0.05, 0.2, 1);
   }
   #intro-welcome {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     font-size: 1rem;
     font-weight: 500;
     color: hsl(var(--foreground));
     white-space: nowrap;
     transition: opacity 0.22s ease;
+  }
+  /* 药丸内渲染的真实导航栏内容（与 Header 对齐，末态/收尾用） */
+  #intro-brand {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: hsl(var(--foreground));
+    white-space: nowrap;
+    text-decoration: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  #intro-nav {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    color: hsl(var(--foreground));
+    opacity: 0;
+    transition: opacity 0.4s ease;
   }
   @keyframes introNavJelly {
     0% {
@@ -137,41 +201,58 @@
   html.intro-playing #intro-overlay {
     display: block;
   }
-  html.intro-playing header-component,
-  html.intro-navready header-component {
-    transition: opacity 0.5s ease !important;
+  /* 【A 方案特有】背景光层与前景层同步显隐：仅播放时显示 */
+  html.intro-playing #intro-backdrop {
+    display: block;
   }
   html.intro-playing header-component {
     opacity: 0;
     pointer-events: none;
   }
-  html.intro-navready header-component {
-    opacity: 1;
-    pointer-events: auto;
+  /* 真实背景渐变在入场期间隐藏；收尾“瞬时换帧”时即时显现（无过渡），与遮罩里同款渐变无缝对接 */
+  html.intro-playing #highlight-gradient {
+    opacity: 0;
   }
   html.intro-playing main,
   html.intro-playing #main-container > :last-child {
     opacity: 0;
-    transform: translateY(2rem);
+    transform: translateY(1.25rem);
   }
   html.intro-revealing main,
   html.intro-revealing #main-container > :last-child {
     opacity: 1;
     transform: none;
     transition:
-      opacity 0.8s ease,
-      transform 0.8s ease;
+      opacity 0.45s ease,
+      transform 0.45s cubic-bezier(0.33, 0, 0.25, 1);
   }
 </style>
 
 <script>
   const root = document.documentElement
   const overlay = document.getElementById('intro-overlay') as HTMLElement
-  const bg = document.getElementById('intro-bg') as HTMLElement
+  const backdrop = document.getElementById('intro-backdrop') as HTMLElement
+  const grad = document.getElementById('intro-grad') as HTMLElement
   const glow = document.getElementById('intro-glow') as HTMLElement
+
+  // 【A 方案特有 · DOM 搬运】
+  // 背景光层出生在 #main-container 内（组件在 slot 里）。CSS 死规则：子孙元素无论 z-index 多低，
+  // 都画不到祖先之下。所以把 #intro-backdrop 从出生位置揪出来，挂到 body 层、#main-container 之前，
+  // 它才能凭 z-index:-1 真正落到内容之下、body 底色之上。
+  // 这是 A 方案唯一“取巧”处：写法上节点在组件里、运行时却换了挂载点；好处是改动全锁在本文件、可一键删除。
+  // guard：parentElement 已是 body 时不再重复搬（回放时 play() 会再次进入，避免重复 insertBefore）。
+  function relocateBackdrop() {
+    const mainContainer = document.getElementById('main-container')
+    if (backdrop && mainContainer && backdrop.parentElement !== document.body) {
+      document.body.insertBefore(backdrop, mainContainer)
+    }
+  }
+  relocateBackdrop()
   const title = document.getElementById('intro-title') as HTMLElement
   const pill = document.getElementById('intro-pill') as HTMLElement
   const welcome = document.getElementById('intro-welcome') as HTMLElement
+  const brand = document.getElementById('intro-brand') as HTMLElement
+  const nav = document.getElementById('intro-nav') as HTMLElement
 
   const SESSION_KEY = 'introPlayed'
   const SKIP_EVENTS = ['wheel', 'keydown', 'click', 'touchstart']
@@ -179,6 +260,22 @@
     'rgba(24, 24, 27, 0.08) 0 0 0 1px, rgba(39, 39, 42, 0.08) 0 10px 15px -3px, rgba(39, 39, 42, 0.08) 0 4px 6px -4px'
   let timers: number[] = []
   let running = false
+  let headerRect: DOMRect | null = null
+
+  // 量出真实 Header 的几何，让 .intro-inner 与之精确重合（消除滚动条/内边距导致的偏移）
+  function syncGeometry(): DOMRect | null {
+    const header = document.querySelector('header-component') as HTMLElement | null
+    const inner = overlay.querySelector('.intro-inner') as HTMLElement | null
+    if (!header || !inner) return null
+    const r = header.getBoundingClientRect()
+    if (r.width === 0) return null
+    inner.style.left = `${r.left}px`
+    inner.style.right = 'auto'
+    inner.style.width = `${r.width}px`
+    inner.style.marginInline = '0'
+    inner.style.maxWidth = 'none'
+    return r
+  }
 
   const add = (ms: number, fn: () => void) => timers.push(window.setTimeout(fn, ms))
   const clearAll = () => {
@@ -203,11 +300,14 @@
     pill.style.background = 'hsl(var(--background))'
     pill.style.borderColor = 'hsl(var(--border))'
     pill.style.boxShadow = PILL_SHADOW
+    pill.style.setProperty('backdrop-filter', 'none')
+    pill.style.setProperty('-webkit-backdrop-filter', 'none')
+    relocateBackdrop()
     overlay.style.display = 'block'
     overlay.style.transition = ''
     overlay.style.opacity = '1'
-    bg.style.opacity = '1'
-    root.classList.remove('intro-revealing', 'intro-navready')
+    grad.style.opacity = '0'
+    root.classList.remove('intro-revealing')
     root.classList.add('intro-playing')
     glow.style.opacity = '0'
     glow.style.top = '50%'
@@ -225,14 +325,26 @@
     pill.style.borderRadius = '999px'
     pill.style.padding = '0 28px'
     welcome.style.opacity = '1'
+    brand.style.opacity = '0'
+    nav.style.opacity = '0'
+    // 复位玻璃条外扩时给 brand/nav 加的内缩（见上移步骤 ⓕ），回放从干净状态开始
+    brand.style.left = '0'
+    nav.style.right = '0'
   }
 
   function finish() {
     running = false
     clearAll()
     removeSkip()
-    root.classList.remove('intro-playing', 'intro-revealing', 'intro-navready')
+    pill.style.animation = 'none'
+    pill.style.transform = 'translateX(-50%) scale(1)'
     overlay.style.display = 'none'
+    // 瞬时换帧：移除 intro-playing → 真实 Header/渐变即时显现、遮罩隐藏（前后两帧一致，无叠色）。
+    // 同一帧加 intro-revealing → 此前一直隐藏的内容此刻才从下往上淡入：
+    // 蓝光已撤、真实渐变在内容之下，组件全程保持原色、不再有“突然变回”。
+    root.classList.remove('intro-playing')
+    root.classList.add('intro-revealing')
+    window.setTimeout(() => root.classList.remove('intro-revealing'), 600)
     try {
       sessionStorage.setItem(SESSION_KEY, '1')
     } catch (e) {}
@@ -241,6 +353,7 @@
   function play() {
     running = true
     resetVisual()
+    headerRect = syncGeometry()
     addSkip()
     requestAnimationFrame(() =>
       requestAnimationFrame(() => {
@@ -254,26 +367,61 @@
           glow.style.transform = 'translate(-50%,-50%) scale(1.04)'
         })
 
-        // ③ 沿直线上移 + 对称展开（保留背景/边框，便于看清变形与回弹）
+        // ③ 沿直线上移 + 对称展开：实心 → 液态玻璃；欢迎语淡出，真实导航栏内容淡入
         add(1650, () => {
           pill.style.transition =
-            'top .42s cubic-bezier(.33,0,.25,1), width .42s cubic-bezier(.33,0,.25,1), height .42s ease, border-radius .42s ease, padding .42s ease'
+            'top .42s cubic-bezier(.33,0,.25,1), width .42s cubic-bezier(.33,0,.25,1), height .42s ease, border-radius .42s ease, padding .42s ease, background .42s ease, box-shadow .42s ease, backdrop-filter .42s ease, -webkit-backdrop-filter .42s ease'
           welcome.style.opacity = '0'
+          brand.style.opacity = '1'
+          nav.style.opacity = '1'
           title.style.opacity = '0'
           title.style.top = 'calc(50% - 100px)'
-          pill.style.top = '1rem'
-          pill.style.width = '100%'
-          pill.style.height = '3rem'
+          // ┌──────────────────────────────────────────────────────────────────────┐
+          // │ 【玻璃导航条 · 形状尺寸区】药丸到顶后的“大小与轮廓”，与上方质感区配套。   │
+          // │ headerRect 是 syncGeometry() 量出的真实 Header 几何，没量到时用兜底值。   │
+          // └──────────────────────────────────────────────────────────────────────┘
+          // ⓐ 顶部位置：对齐真实 Header 的 top（量不到则退回 1rem）——决定停在多高
+          pill.style.top = headerRect ? `${headerRect.top}px` : '1rem'
+          // ⓑ 宽度：撑满容器 + 两侧外扩，让玻璃条向两边各伸出 GLASS_EXTEND_PX/2，给文字留呼吸位、避免贴边穿模。
+          //    GLASS_EXTEND_PX = 两侧合计外扩量（每侧一半）。想让玻璃条更宽，只调这一个常量即可。
+          const GLASS_EXTEND_PX = 40
+          pill.style.width = `calc(100% + ${GLASS_EXTEND_PX}px)`
+          // ⓒ 高度：对齐真实 Header 高度（量不到则退回 3rem）——决定条的粗细
+          pill.style.height = headerRect ? `${headerRect.height}px` : '3rem'
+          // ⓓ 圆角：从 999px 胶囊收成 .875rem 圆角矩形（改大更圆、改 0 变直角）
           pill.style.borderRadius = '.875rem'
-          pill.style.padding = '0 .75rem'
+          // ⓔ 内距：0（brand/nav 是 position:absolute，锚在内边框、无视 padding，所以靠 padding 撑不开它们，留 0）
+          pill.style.padding = '0'
+          // ⓕ 内容回缩（与 ⓑ 联动的关键）：brand(left)/nav(right) 各向内缩 GLASS_EXTEND_PX/2，
+          //    正好抵消 ⓑ 的外扩 → 文字落回真实 Header 边缘、内部比例间距不变，且与收尾真实导航栏对齐（无跳变）。
+          //    只有玻璃条本身向两侧多伸出去。已实测 brand/nav 像素级不动。复位见 resetVisual()。
+          brand.style.left = `${GLASS_EXTEND_PX / 2}px`
+          nav.style.right = `${GLASS_EXTEND_PX / 2}px`
+          // ┌─────────────────────────────────────────────────────────────────────────┐
+          // │ 【玻璃导航条 · 样式主控区】药丸到顶后“实心 → 液态玻璃”的外观，全在这 5 行。 │
+          // │ 想调玻璃质感就改这里（变形时长见上方 line 369 的 transition）。            │
+          // └─────────────────────────────────────────────────────────────────────────┘
+          // ① 磨砂填充：/0.4 = 半透明度，越小越透、越大越实（变“暗块”往往是这里太高或 blur 太低）
+          pill.style.background = 'hsl(var(--background) / 0.4)'
+          // ② 玻璃边沿：亮色描边，/0.55 控制边缘亮度，越高边越“发光”
+          pill.style.borderColor = 'hsl(var(--background) / 0.55)'
+          // ③ 立体感三件套：inset 顶部高光线 + inset 底部内阴影 + 外部柔和投影（最后一段是落影，调 0.18 改深浅）
+          pill.style.boxShadow =
+            'inset 0 1px 0 hsl(var(--background) / 0.95), inset 0 -6px 12px -10px hsl(var(--foreground) / 0.06), 0 10px 28px -12px rgba(0, 0, 0, 0.18)'
+          // ④ 背景虚化：blur(16px) = 磨砂强度，越大越“毛玻璃”、越小越清晰（与 ① 配合决定通透感）
+          pill.style.setProperty('backdrop-filter', 'blur(16px)')
+          pill.style.setProperty('-webkit-backdrop-filter', 'blur(16px)')
+          // 光晕向上舒展并淡出，遮罩自带的同款渐变同步淡入接替（蓝色连续，0.25 与真实背景一致）
           glow.style.top = '0'
           glow.style.height = '52vh'
           glow.style.width = '170%'
           glow.style.transform = 'translate(-50%,-44%) scale(1)'
           glow.style.filter = 'blur(64px)'
           glow.style.opacity = '0'
-          bg.style.opacity = '0'
-          // 内容随上移同步从下往上渐显
+          grad.style.opacity = '0.25'
+          // 【A 方案特有 · 同步渐显】蓝光已在内容之下，此刻让内容随药丸一起从下往上淡入，
+          // 内容直接盖在蓝光上＝真实页面的样子。尾部“加载等待感”消除（不必等收尾换帧才出现）。
+          // intro-revealing 规则排在 intro-playing 之后、特异性相同，两 class 同挂 <html> 时 revealing 胜出。
           root.classList.add('intro-revealing')
         })
 
@@ -283,21 +431,21 @@
           pill.style.animation = 'introNavJelly .4s cubic-bezier(.3,.6,.3,1)'
         })
 
-        // ⑤ 回弹后：背景/边框/阴影淡为透明，露出真实导航栏（对齐）+ 内容渐显
-        add(1650 + 400 + 420, () => {
+        // ⑤ 回弹后：玻璃干净化掉（填充/边框/阴影/模糊 → 透明），只剩“导航文字 + 同款渐变”= 真实页面的样子
+        add(1650 + 400 + 410, () => {
           pill.style.animation = 'none'
           pill.style.transform = 'translateX(-50%) scale(1)'
-          // 回弹结束后：背景/边框/阴影一起化开，真实导航栏对齐显现
           pill.style.transition =
-            'background .35s ease, border-color .35s ease, box-shadow .35s ease'
+            'background .35s ease, border-color .35s ease, box-shadow .35s ease, backdrop-filter .35s ease, -webkit-backdrop-filter .35s ease'
           pill.style.background = 'transparent'
           pill.style.borderColor = 'transparent'
           pill.style.boxShadow = 'none'
-          root.classList.add('intro-navready')
+          pill.style.setProperty('backdrop-filter', 'blur(0px)')
+          pill.style.setProperty('-webkit-backdrop-filter', 'blur(0px)')
         })
 
-        // ✓ 收尾移除遮罩
-        add(1650 + 400 + 420 + 420, finish)
+        // ✓ 玻璃化净后：瞬时换帧（遮罩最后一帧已等于真实页面，直接整体替换，无淡入淡出 → 无叠色/重影）
+        add(1650 + 400 + 410 + 390, finish)
       })
     )
   }
