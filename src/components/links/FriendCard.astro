@@ -21,7 +21,7 @@ const avatar =
   class='group block h-full rounded-2xl no-underline outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background'
 >
   <article
-    class='relative h-full overflow-hidden rounded-2xl border bg-background px-3 py-2 transition-colors duration-200 group-hover:bg-muted sm:px-4'
+    class='friend-card relative h-full overflow-hidden rounded-2xl border bg-background px-3 py-2 group-hover:bg-muted sm:px-4'
   >
     <div class='relative z-10 flex h-full items-center gap-3'>
       <div class='relative h-14 w-14 min-w-14 overflow-hidden rounded-full bg-card'>
@@ -76,3 +76,29 @@ const avatar =
     />
   </article>
 </a>
+
+<style>
+  /* hover 从平面变色升级为 Apple 式“拾起”：弹簧上浮 + 影子加深（颜色过渡仍保留） */
+  .friend-card {
+    transition:
+      background-color 0.3s ease,
+      transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.35s ease;
+  }
+  a:hover .friend-card,
+  a:focus-visible .friend-card {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 28px -14px rgb(0 0 0 / 0.2);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .friend-card {
+      transition: background-color 0.3s ease;
+    }
+    a:hover .friend-card,
+    a:focus-visible .friend-card {
+      transform: none;
+      box-shadow: none;
+    }
+  }
+</style>

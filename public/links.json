@@ -10,8 +10,16 @@
           "link": "https://cxin.vercel.app/",
           "avatar": "https://cxin.vercel.app/favicon/android-chrome-512x512.png",
           "ludus": {
-            "desktop": { "x": 80, "y": 50, "size": 90 },
-            "mobile": { "x": 20, "y": 35, "size": 82 },
+            "desktop": {
+              "x": 80,
+              "y": 50,
+              "size": 90
+            },
+            "mobile": {
+              "x": 83,
+              "y": 20,
+              "size": 80
+            },
             "rotate": -6,
             "parallaxX": 40,
             "parallaxY": -30
@@ -29,9 +37,9 @@
               "size": 96
             },
             "mobile": {
-              "x": 0,
-              "y": 42,
-              "size": 96
+              "x": 15,
+              "y": 78,
+              "size": 88
             },
             "rotate": 7,
             "parallaxX": -60,
@@ -50,9 +58,9 @@
               "size": 96
             },
             "mobile": {
-              "x": 100,
-              "y": 42,
-              "size": 96
+              "x": 84,
+              "y": 82,
+              "size": 84
             },
             "rotate": -8,
             "parallaxX": 80,
@@ -71,9 +79,9 @@
               "size": 78
             },
             "mobile": {
-              "x": 8,
-              "y": 12,
-              "size": 78
+              "x": 16,
+              "y": 15,
+              "size": 72
             },
             "rotate": -5,
             "parallaxX": -35,

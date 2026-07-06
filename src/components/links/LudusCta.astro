@@ -11,11 +11,18 @@ const cards = getLudusFriends(links)
 
 <section id='ludus-cta' class='ludus-section not-prose' aria-label='精选友链'>
   <div class='ludus-stage'>
-    {cards.map(({ friend, layout }) => <LudusCard friend={friend} layout={layout} />)}
+    {
+      cards.map(({ friend, layout }, index) => (
+        <LudusCard friend={friend} layout={layout} order={index} />
+      ))
+    }
 
     <a class='ludus-center' href={siteLink.link} aria-label={`返回 ${siteLink.name} 首页`}>
-      <span class='ludus-center-surface'>
-        <img src='/images/avatar.webp' alt='' class='ludus-center-icon' width='88' height='88' />
+      {/* 浮动层单独一层，与 LudusCard 同构：漂浮不与 hover/入场 transform 打架 */}
+      <span class='ludus-center-float'>
+        <span class='ludus-center-surface'>
+          <img src='/images/avatar.webp' alt='' class='ludus-center-icon' width='88' height='88' />
+        </span>
       </span>
       <span class='ludus-center-label'>{siteLink.name}</span>
     </a>
@@ -101,7 +108,24 @@ const cards = getLudusFriends(links)
     outline: none;
     transform: translate(-50%, -50%)
       translate(calc(var(--ludus-mouse-x) * 6px), calc(var(--ludus-mouse-y) * 6px));
-    transition: transform 200ms ease-out;
+    /* 与友链卡同款惯性滑行曲线，视差拖尾更柔 */
+    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* 中心站点慢速缓浮（幅度小于友链卡，主次分明） */
+  .ludus-center-float {
+    display: block;
+    width: 100%;
+    height: 100%;
+    animation: ludusCenterFloat 7.5s ease-in-out infinite alternate;
+  }
+  @keyframes ludusCenterFloat {
+    from {
+      transform: translateY(-2px);
+    }
+    to {
+      transform: translateY(2px);
+    }
   }
 
   .ludus-center-surface {
@@ -115,17 +139,30 @@ const cards = getLudusFriends(links)
     background: var(--ludus-card-bg);
     filter: drop-shadow(0 12px 18px var(--ludus-card-shadow));
     transition:
-      transform 200ms ease,
-      border-radius 220ms ease,
-      filter 220ms ease;
+      transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      border-radius 300ms ease,
+      filter 300ms ease;
+    /* 中心站点最先弹出，随后友链卡依次 pop（延迟见 LudusCard） */
+    animation: ludusCenterPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s backwards;
+  }
+  @keyframes ludusCenterPop {
+    from {
+      opacity: 0;
+      transform: scale(0.3);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 
+  /* hover 改为“拾起”：轻微放大 + 圆角变润 + 影子加深（原为按下缩小 0.94） */
   .ludus-center:hover .ludus-center-surface,
   .ludus-center.is-hovered .ludus-center-surface,
   .ludus-center:focus-visible .ludus-center-surface {
-    border-radius: 36px;
-    filter: drop-shadow(0 16px 26px var(--ludus-card-shadow-hover));
-    transform: scale(0.94);
+    border-radius: 32px;
+    filter: drop-shadow(0 18px 30px var(--ludus-card-shadow-hover));
+    transform: scale(1.05);
   }
 
   .ludus-center:focus-visible .ludus-center-surface {
@@ -162,9 +199,9 @@ const cards = getLudusFriends(links)
     box-shadow: 0 10px 22px var(--ludus-label-shadow);
     transform: translate(-50%, 0.8rem) scale(0.9);
     transition:
-      opacity 180ms ease,
-      visibility 0s linear 180ms,
-      transform 240ms ease-out;
+      opacity 200ms ease,
+      visibility 0s linear 200ms,
+      transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .ludus-center:hover .ludus-center-label,
@@ -195,6 +232,11 @@ const cards = getLudusFriends(links)
     .ludus-center {
       transform: translate(-50%, -50%);
       transition: none;
+    }
+
+    .ludus-center-float,
+    .ludus-center-surface {
+      animation: none;
     }
 
     .ludus-center-surface,
@@ -236,7 +278,9 @@ const cards = getLudusFriends(links)
         if (transform && transform !== 'none') {
           const matrix = new DOMMatrixReadOnly(transform)
           const rotation = Math.atan2(matrix.b, matrix.a) * (180 / Math.PI)
-          const hoverRotation = card.classList.contains('ludus-center') ? 4 : rotation < 0 ? 8 : -8
+          // 悬停回正幅度收敛（原 ±8/4 度）：轻轻“摆正”而不是甩头，配合 420ms 惯性曲线更细腻
+          const hoverRotation =
+            card.classList.contains('ludus-center') ? 2 : rotation < 0 ? 3.5 : -3.5
 
           card.style.transform = `matrix(${matrix.a}, ${matrix.b}, ${matrix.c}, ${matrix.d}, ${matrix.e}, ${matrix.f}) rotate(${hoverRotation}deg)`
         }

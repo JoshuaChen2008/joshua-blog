@@ -6,9 +6,11 @@ import config from '@/site-config'
 interface Props {
   friend: FriendLink
   layout: ResolvedLudusLayout
+  /** 入场错峰序号：pop 延迟与浮动相位都由它推导 */
+  order?: number
 }
 
-const { friend, layout } = Astro.props
+const { friend, layout, order = 0 } = Astro.props
 const avatar =
   (config.integ?.links?.cacheAvatar ?? false)
     ? (friend.avatar_cache?.path ?? friend.avatar)
@@ -23,7 +25,8 @@ const style = [
   `--ludus-rotate:${layout.rotate}deg`,
   `--ludus-parallax-x:${layout.parallaxX}px`,
   `--ludus-parallax-y:${layout.parallaxY}px`,
-  `--ludus-z:${layout.zIndex}`
+  `--ludus-z:${layout.zIndex}`,
+  `--ludus-order:${order}`
 ].join(';')
 ---
 
@@ -35,16 +38,19 @@ const style = [
   style={style}
   aria-label={`访问 ${friend.name}`}
 >
-  <span class='ludus-card-surface'>
-    <img
-      src={avatar}
-      alt=''
-      class='ludus-card-icon'
-      width={layout.desktop.size}
-      height={layout.desktop.size}
-      loading='lazy'
-      decoding='async'
-    />
+  {/* 浮动层单独一层：常驻上下漂浮不与 hover/入场的 transform 打架 */}
+  <span class='ludus-float'>
+    <span class='ludus-card-surface'>
+      <img
+        src={avatar}
+        alt=''
+        class='ludus-card-icon'
+        width={layout.desktop.size}
+        height={layout.desktop.size}
+        loading='lazy'
+        decoding='async'
+      />
+    </span>
   </span>
   <span class='ludus-tooltip'>
     <span class='ludus-label'>{friend.name}</span>
@@ -54,12 +60,18 @@ const style = [
 
 <style>
   .ludus-card {
+    /* 生效几何统一走 --_x/--_y/--_size，移动端只需覆盖这三个变量 */
+    --_x: var(--ludus-x);
+    --_y: var(--ludus-y);
+    --_size: var(--ludus-size);
     position: absolute;
-    top: var(--ludus-y);
-    left: var(--ludus-x);
+    /* clamp 位置护栏：无论 links.json 坐标怎么写（哪怕 0%/100%），
+       卡片中心都被留在舞台内侧半个卡身 + 6px，杜绝被 overflow:hidden 裁切 */
+    top: clamp(calc(var(--_size) / 2 + 6px), var(--_y), calc(100% - var(--_size) / 2 - 6px));
+    left: clamp(calc(var(--_size) / 2 + 6px), var(--_x), calc(100% - var(--_size) / 2 - 6px));
     z-index: var(--ludus-z);
-    width: var(--ludus-size);
-    height: var(--ludus-size);
+    width: var(--_size);
+    height: var(--_size);
     color: inherit;
     outline: none;
     transform: translate(-50%, -50%)
@@ -68,7 +80,25 @@ const style = [
         calc(var(--ludus-mouse-y, 0) * var(--ludus-parallax-y))
       )
       rotate(var(--ludus-rotate));
-    transition: transform 180ms ease-out;
+    /* 视差拖尾：慢出曲线让卡片带一点“惯性滑行”，比 180ms 直给柔和得多 */
+    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* 常驻缓浮：时长与相位都由 order 推导，各卡不同步，像悬浮的玻璃片 */
+  .ludus-float {
+    display: block;
+    width: 100%;
+    height: 100%;
+    animation: ludusFloat calc(5.2s + var(--ludus-order, 0) * 0.6s) ease-in-out
+      calc(var(--ludus-order, 0) * -1.3s) infinite alternate;
+  }
+  @keyframes ludusFloat {
+    from {
+      transform: translateY(-3px);
+    }
+    to {
+      transform: translateY(3px);
+    }
   }
 
   .ludus-card-surface {
@@ -82,21 +112,35 @@ const style = [
     background: var(--ludus-card-bg);
     filter: drop-shadow(0 10px 14px var(--ludus-card-shadow));
     transition:
-      transform 200ms ease-out,
-      border-radius 220ms ease,
-      border-color 220ms ease,
-      background-color 220ms ease,
-      filter 220ms ease;
+      transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      border-radius 300ms ease,
+      border-color 300ms ease,
+      background-color 300ms ease,
+      filter 300ms ease;
+    /* 错峰弹簧入场：中心站点先出（见 LudusCta），友链依次 pop（backwards 保证延迟期不可见） */
+    animation: ludusPop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1)
+      calc(0.24s + var(--ludus-order, 0) * 90ms) backwards;
+  }
+  @keyframes ludusPop {
+    from {
+      opacity: 0;
+      transform: scale(0.3);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 
+  /* hover 从“按下缩小”改为 visionOS 式“拾起”：放大 + 圆角变润 + 影子加深 */
   .ludus-card:hover .ludus-card-surface,
   .ludus-card.is-hovered .ludus-card-surface,
   .ludus-card:focus-visible .ludus-card-surface {
     border-color: var(--ludus-card-border-hover);
-    border-radius: 34px;
+    border-radius: 30px;
     background: var(--ludus-card-bg-hover);
-    filter: drop-shadow(0 14px 22px var(--ludus-card-shadow-hover));
-    transform: scale(0.92);
+    filter: drop-shadow(0 18px 28px var(--ludus-card-shadow-hover));
+    transform: scale(1.06);
   }
 
   .ludus-card:focus-visible .ludus-card-surface {
@@ -125,9 +169,9 @@ const style = [
     pointer-events: none;
     visibility: hidden;
     transition:
-      opacity 180ms ease,
-      visibility 0s linear 180ms,
-      transform 240ms ease-out;
+      opacity 200ms ease,
+      visibility 0s linear 200ms,
+      transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .ludus-label,
@@ -196,10 +240,9 @@ const style = [
 
   @media (max-width: 768px) {
     .ludus-card {
-      top: var(--ludus-mobile-y);
-      left: var(--ludus-mobile-x);
-      width: var(--ludus-mobile-size);
-      height: var(--ludus-mobile-size);
+      --_x: var(--ludus-mobile-x);
+      --_y: var(--ludus-mobile-y);
+      --_size: var(--ludus-mobile-size);
     }
 
     .ludus-tooltip {
@@ -216,6 +259,11 @@ const style = [
     .ludus-card {
       transform: translate(-50%, -50%) rotate(var(--ludus-rotate));
       transition: none;
+    }
+
+    .ludus-float,
+    .ludus-card-surface {
+      animation: none;
     }
 
     .ludus-card-surface,
