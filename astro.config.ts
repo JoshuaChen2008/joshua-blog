@@ -31,7 +31,8 @@ export default defineConfig({
   // base: '/astro-pure/',
   trailingSlash: 'never',
   // root: './my-project-directory',
-  server: { host: true },
+  // PORT env lets tooling (e.g. preview harness) assign a free port when 4321 is taken
+  server: { host: true, port: process.env.PORT ? Number(process.env.PORT) : 4321 },
   // https://docs.astro.build/en/guides/prefetch/
   prefetch: {
     // prefetchAll: true,
