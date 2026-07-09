@@ -87,6 +87,29 @@
             "parallaxX": -35,
             "parallaxY": -50
           }
+        },
+        {
+          "name": "Andrew Zhang",
+          "desc": "Scientific ML, embedded systems, GPU-aware software, and reproducible computational pipelines.",
+          "link": "https://andyzpb.github.io/blog",
+          "avatar": "https://andyzpb.github.io/blog/favicon/android-chrome-512x512.png",
+          "ludus": {
+            "desktop": {
+              "x": 32,
+              "y": 82,
+              "size": 88
+            },
+            "mobile": {
+              "x": 84,
+              "y": 50,
+              "size": 76
+            },
+            "rotate": 5,
+            "parallaxX": -45,
+            "parallaxY": 55,
+            "labelSide": "left",
+            "zIndex": 2
+          }
         }
       ]
     },
