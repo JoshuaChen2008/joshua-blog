@@ -71,6 +71,12 @@ bun run check
 # 创建新文章
 bun run pure new
 
+# 创建带独立目录的 Blog 模板
+bun run blog:new -- "暑假-第二周"
+
+# 将文章目录中的封面转为 WebP，并自动写入 heroImage
+bun run blog:cover -- "src/content/blog/暑假-第二周/封面.png"
+
 # 格式化代码
 bun run format
 
@@ -79,6 +85,80 @@ bun run lint
 
 # 一键检查与格式化
 bun run yijiansilian
+```
+
+## Blog 创建与封面处理
+
+项目中的每篇 Blog 使用独立目录存放 Markdown 和封面图片：
+
+```text
+src/content/blog/
+└─ 暑假-第二周/
+   ├─ 暑假-第二周.md
+   └─ 封面.webp
+```
+
+### 创建文章模板
+
+执行以下命令可创建文章目录和空白 Markdown 模板：
+
+```shell
+bun run blog:new -- "暑假-第二周"
+```
+
+默认生成 `src/content/blog/暑假-第二周/暑假-第二周.md`，标题使用目录名，发布日期和更新日期使用 Asia/Singapore 时区的当天日期。模板默认包含 `Blog`、`日常` 标签和 `Chinese` 语言，不会写入 `draft`。
+
+如需让目录名、Markdown 文件名和文章标题不同，可以使用：
+
+```shell
+bun run blog:new -- "期末月-第四周" --file Qimo4 --title "期末月的第四周"
+```
+
+这会生成 `src/content/blog/期末月-第四周/Qimo4.md`。命令不会覆盖已有目录。
+
+### 转换并设置封面
+
+先把 PNG、JPEG 等原图放入文章目录，然后执行：
+
+```shell
+bun run blog:cover -- "src/content/blog/暑假-第二周/封面.png"
+```
+
+命令会完成以下操作：
+
+- 使用 Sharp 自动修正 EXIF 方向。
+- 将图片等比缩放到最大宽度 1920px，小图不会放大。
+- 使用质量 82 转换为同名 WebP，默认保留原图。
+- 自动提取图片主色。
+- 找到同目录中唯一的 `.md` 或 `.mdx`，写入或更新 `heroImage`。
+
+最终 frontmatter 会增加类似内容：
+
+```yaml
+heroImage: { src: './封面.webp', color: '#FFE4B5' }
+```
+
+可以按需覆盖默认参数：
+
+```shell
+bun run blog:cover -- "src/content/blog/暑假-第二周/封面.png" --name chuyini2 --quality 85 --width 1600 --color "#FFE4B5"
+```
+
+可用选项：
+
+- `--name <文件名>`：指定输出名称，扩展名固定为 `.webp`。
+- `--quality <1-100>`：设置 WebP 质量，默认 `82`。
+- `--width <像素>`：设置最大宽度，默认 `1920`。
+- `--color <#RRGGBB>`：使用指定主题色，不自动提取。
+- `--force`：覆盖已经存在的目标 WebP。
+- `--remove-source`：转换并更新文章成功后删除原图。
+
+封面路径必须位于 `src/content/blog` 下的一级文章目录中，该目录必须且只能包含一个 Markdown 或 MDX 文件。未生成封面前，文章模板不会提前写入无效的 `heroImage` 路径。
+
+运行 Blog 工具测试：
+
+```shell
+bun run test:blog
 ```
 
 ## 特性

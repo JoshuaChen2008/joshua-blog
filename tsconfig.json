@@ -33,6 +33,7 @@
     "./.vscode",
     "./dist",
     "./public/scripts/*",
+    "./scripts/**/*.test.ts",
     "./test/*"
   ]
 }
