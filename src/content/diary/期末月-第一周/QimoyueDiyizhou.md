@@ -4,7 +4,7 @@ publishDate: 2026-06-07
 updatedDate: 2026-06-07
 description: '六月份往往都是忙碌的，有即将离别的学长，有准备高考的新生，还有一群备考期末的大学生。'
 tags:
-  - Blog
+  - Diary
   - 日常
 language: 'Chinese'
 heroImage: { src: './qimo-cover.webp', color: '#FF6347' }

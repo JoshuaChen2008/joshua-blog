@@ -4,7 +4,7 @@ publishDate: 2026-07-06
 updatedDate: 2026-07-06
 description: '当期末的最后一场考试结束时，我的大一生活也迎来了句号'
 tags:
-  - Blog
+  - Diary
   - 日常
 language: 'Chinese'
 heroImage: { src: './33.webp', color: '#83d5d0' }

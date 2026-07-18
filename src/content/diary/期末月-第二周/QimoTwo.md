@@ -4,7 +4,7 @@ publishDate: 2026-06-15
 updatedDate: 2026-06-15
 description: '摆烂的一周'
 tags:
-  - Blog
+  - Diary
   - 日常
 language: 'Chinese'
 heroImage: { src: './QimoTwo1.webp', color: '#F7E7CE' }

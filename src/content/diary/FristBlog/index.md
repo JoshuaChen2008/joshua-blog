@@ -4,7 +4,7 @@ publishDate: 2026-06-03
 updatedDate: 2026-06-03
 description: '这个网站建立后的第一篇博客，也是我人生中写的第一篇博客'
 tags:
-  - Blog
+  - Diary
   - 日常
 language: 'Chinese'
 heroImage: { src: './kibou2-cover.webp', color: '#83d5d0' }

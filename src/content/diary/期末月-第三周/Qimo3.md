@@ -4,7 +4,7 @@ publishDate: 2026-06-21
 updatedDate: 2026-06-21
 description: '依旧摆烂'
 tags:
-  - Blog
+  - Diary
   - 日常
 language: 'Chinese'
 heroImage: { src: './qimo3t.webp', color: '#81613C' }
