@@ -12,12 +12,17 @@ import { visit } from 'unist-util-visit'
 import { getBlogCollection, sortMDByDate } from 'astro-pure/server'
 import config from 'virtual:config'
 
+type FeedEntry = CollectionEntry<'blog'> | CollectionEntry<'diary'>
+
 // Get dynamic import of images as a map collection
 const imagesGlob = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/content/blog/**/*.{jpeg,jpg,png,gif,avif,webp}' // add more image formats if needed
+  [
+    '/src/content/blog/**/*.{jpeg,jpg,png,gif,avif,webp}',
+    '/src/content/diary/**/*.{jpeg,jpg,png,gif,avif,webp}'
+  ] // add more image formats if needed
 )
 
-const renderContent = async (post: CollectionEntry<'blog'>, site: URL) => {
+const renderContent = async (post: FeedEntry, site: URL) => {
   // Replace image links with the correct path
   function remarkReplaceImageLink() {
     /**
@@ -29,7 +34,7 @@ const renderContent = async (post: CollectionEntry<'blog'>, site: URL) => {
         if (node.url.startsWith('/images')) {
           node.url = `${site}${node.url.replace('/', '')}`
         } else {
-          const imagePathPrefix = `/src/content/blog/${post.id}/${node.url.replace('./', '')}`
+          const imagePathPrefix = `/src/content/${post.collection}/${post.id}/${node.url.replace('./', '')}`
           const promise = imagesGlob[imagePathPrefix]?.().then(async (res) => {
             const imagePath = res?.default
             if (imagePath) {
@@ -54,7 +59,10 @@ const renderContent = async (post: CollectionEntry<'blog'>, site: URL) => {
 }
 
 const GET = async (context: AstroGlobal) => {
-  const allPostsByDate = sortMDByDate(await getBlogCollection()) as CollectionEntry<'blog'>[]
+  const allPostsByDate = sortMDByDate([
+    ...(await getBlogCollection()),
+    ...(await getBlogCollection('diary'))
+  ]) as FeedEntry[]
   const siteUrl = context.site ?? new URL(import.meta.env.SITE)
 
   return rss({
@@ -70,7 +78,7 @@ const GET = async (context: AstroGlobal) => {
     items: await Promise.all(
       allPostsByDate.map(async (post) => ({
         pubDate: post.data.publishDate,
-        link: `/blog/${post.id}`,
+        link: `/${post.collection}/${post.id}`,
         customData: `<h:img src="${typeof post.data.heroImage?.src === 'string' ? post.data.heroImage?.src : post.data.heroImage?.src.src}" />
           <enclosure url="${typeof post.data.heroImage?.src === 'string' ? post.data.heroImage?.src : post.data.heroImage?.src.src}" />`,
         content: await renderContent(post, siteUrl),

@@ -1,4 +1,4 @@
-import { defineCollection } from 'astro:content'
+import { defineCollection, type SchemaContext } from 'astro:content'
 import { glob } from 'astro/loaders'
 import { z } from 'astro/zod'
 
@@ -9,36 +9,44 @@ function removeDupsAndLowerCase(array: string[]) {
   return Array.from(distinctItems)
 }
 
+// Shared schema for post-like collections (blog & diary)
+const postSchema = ({ image }: SchemaContext) =>
+  z.object({
+    // Required
+    title: z.string().max(60),
+    description: z.string().max(160),
+    publishDate: z.coerce.date(),
+    // Optional
+    updatedDate: z.coerce.date().optional(),
+    heroImage: z
+      .object({
+        src: image(),
+        alt: z.string().optional(),
+        inferSize: z.boolean().optional(),
+        width: z.number().optional(),
+        height: z.number().optional(),
+
+        color: z.string().optional()
+      })
+      .optional(),
+    tags: z.array(z.string()).default([]).transform(removeDupsAndLowerCase),
+    language: z.string().optional(),
+    draft: z.boolean().default(false),
+    // Special fields
+    comment: z.boolean().default(true)
+  })
+
 // Define blog collection
 const blog = defineCollection({
   // Load Markdown and MDX files in the `src/content/blog/` directory.
   loader: glob({ base: './src/content/blog', pattern: '**/*.{md,mdx}' }),
-  // Required
-  schema: ({ image }) =>
-    z.object({
-      // Required
-      title: z.string().max(60),
-      description: z.string().max(160),
-      publishDate: z.coerce.date(),
-      // Optional
-      updatedDate: z.coerce.date().optional(),
-      heroImage: z
-        .object({
-          src: image(),
-          alt: z.string().optional(),
-          inferSize: z.boolean().optional(),
-          width: z.number().optional(),
-          height: z.number().optional(),
+  schema: postSchema
+})
 
-          color: z.string().optional()
-        })
-        .optional(),
-      tags: z.array(z.string()).default([]).transform(removeDupsAndLowerCase),
-      language: z.string().optional(),
-      draft: z.boolean().default(false),
-      // Special fields
-      comment: z.boolean().default(true)
-    })
+// Define diary collection (daily posts, previously the blog collection)
+const diary = defineCollection({
+  loader: glob({ base: './src/content/diary', pattern: '**/*.{md,mdx}' }),
+  schema: postSchema
 })
 
 const note = defineCollection({
@@ -84,4 +92,4 @@ const note = defineCollection({
 
 // Define docs collection
 
-export const collections = { blog, note }
+export const collections = { blog, diary, note }

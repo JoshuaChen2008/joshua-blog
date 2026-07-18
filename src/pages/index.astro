@@ -1,11 +1,12 @@
 ---
 import { Image } from 'astro:assets'
+import type { CollectionEntry } from 'astro:content'
 
 import { Quote } from 'astro-pure/advanced'
-import { PostPreview } from 'astro-pure/components/pages'
 import { getBlogCollection, sortMDByDate } from 'astro-pure/server'
 import { Button, Card, Icon, Label } from 'astro-pure/user'
 import PageLayout from '@/layouts/BaseLayout.astro'
+import PostPreview from '@/components/PostPreview.astro'
 import IntroAnimation from '@/components/home/IntroAnimation.astro'
 import IntroReplayButton from '@/components/home/IntroReplayButton.astro'
 import Section from '@/components/home/Section.astro'
@@ -27,8 +28,11 @@ const Agent = [
 const Tools = ['Codex', 'Opencode', 'Git', 'Docker', 'Figma', 'Stitch']
 
 const MAX_POSTS = 10
-const allPosts = await getBlogCollection()
-const allPostsByDate = sortMDByDate(allPosts).slice(0, MAX_POSTS)
+const allPosts = [...(await getBlogCollection()), ...(await getBlogCollection('diary'))]
+const allPostsByDate = sortMDByDate(allPosts).slice(0, MAX_POSTS) as (
+  | CollectionEntry<'blog'>
+  | CollectionEntry<'diary'>
+)[]
 
 const imagePath = config.logo.src
 const images = import.meta.glob<{ default: ImageMetadata }>(

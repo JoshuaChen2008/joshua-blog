@@ -12,14 +12,14 @@ import PageLayout from '@/layouts/ContentLayout.astro'
 import { Comment, PageInfo } from '@/components/waline'
 
 interface Props {
-  post: CollectionEntry<'blog'>
-  posts: CollectionEntry<'blog'>[]
+  post: CollectionEntry<'blog'> | CollectionEntry<'diary'>
+  posts: (CollectionEntry<'blog'> | CollectionEntry<'diary'>)[]
   headings: MarkdownHeading[]
   remarkPluginFrontmatter: Record<string, unknown>
 }
 
 const {
-  post: { id, data },
+  post: { id, data, collection },
   posts,
   headings,
   remarkPluginFrontmatter
@@ -47,7 +47,7 @@ const primaryColor = data.heroImage?.color ?? 'hsl(var(--primary) / var(--un-tex
 <PageLayout
   meta={{ articleDate, description, ogImage: socialImage, title }}
   highlightColor={primaryColor}
-  back='/blog'
+  back={`/${collection}`}
 >
   {!!headings.length && <TOC {headings} slot='sidebar' />}
 
