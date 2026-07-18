@@ -39,6 +39,21 @@ describe('convertBlogCover', () => {
     expect((await stat(inputPath)).isFile()).toBeTrue()
   })
 
+  test('支持 diary 集合下的文章目录', async () => {
+    const { projectRoot, articleDirectory, markdownPath } = await createArticle('diary')
+    const inputPath = join(articleDirectory, 'cover.png')
+    await sharp({
+      create: { width: 100, height: 100, channels: 3, background: '#83D5D0' }
+    })
+      .png()
+      .toFile(inputPath)
+
+    const result = await convertBlogCover({ projectRoot, inputPath })
+
+    const markdown = await readFile(markdownPath, 'utf8')
+    expect(markdown).toContain(`heroImage: { src: './cover.webp', color: '${result.color}' }`)
+  })
+
   test('支持指定颜色并删除源文件', async () => {
     const { projectRoot, articleDirectory, markdownPath } = await createArticle()
     const inputPath = join(articleDirectory, 'cover.jpg')
@@ -101,14 +116,14 @@ describe('parseCoverArguments', () => {
   })
 })
 
-async function createArticle(): Promise<{
+async function createArticle(collection: 'blog' | 'diary' = 'blog'): Promise<{
   projectRoot: string
   articleDirectory: string
   markdownPath: string
 }> {
   const projectRoot = await mkdtemp(join(tmpdir(), 'blog-cover-'))
   temporaryDirectories.push(projectRoot)
-  const articleDirectory = join(projectRoot, 'src', 'content', 'blog', 'example')
+  const articleDirectory = join(projectRoot, 'src', 'content', collection, 'example')
   const markdownPath = join(articleDirectory, 'example.md')
   await mkdir(articleDirectory, { recursive: true })
   await writeFile(

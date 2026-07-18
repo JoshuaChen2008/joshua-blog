@@ -72,10 +72,13 @@ bun run check
 bun run pure new
 
 # 创建带独立目录的 Blog 模板
-bun run blog:new -- "暑假-第二周"
+bun run blog:new -- "全栈开发实践"
 
-# 将文章目录中的封面转为 WebP，并自动写入 heroImage
-bun run blog:cover -- "src/content/blog/暑假-第二周/封面.png"
+# 创建带独立目录的 Diary（日记）模板
+bun run diary:new -- "暑假-第二周"
+
+# 将文章目录中的封面转为 WebP，并自动写入 heroImage（blog 和 diary 均可）
+bun run blog:cover -- "src/content/diary/暑假-第二周/封面.png"
 
 # 格式化代码
 bun run format
@@ -87,12 +90,12 @@ bun run lint
 bun run yijiansilian
 ```
 
-## Blog 创建与封面处理
+## 文章创建与封面处理
 
-项目中的每篇 Blog 使用独立目录存放 Markdown 和封面图片：
+站点分为两个文章板块：`src/content/blog/`（Blog，正式文章）和 `src/content/diary/`（Diary，日常日记）。每篇文章使用独立目录存放 Markdown 和封面图片：
 
 ```text
-src/content/blog/
+src/content/diary/
 └─ 暑假-第二周/
    ├─ 暑假-第二周.md
    └─ 封面.webp
@@ -103,10 +106,14 @@ src/content/blog/
 执行以下命令可创建文章目录和空白 Markdown 模板：
 
 ```shell
-bun run blog:new -- "暑假-第二周"
+# Blog 文章（写入 src/content/blog，模板带 Blog 标签）
+bun run blog:new -- "全栈开发实践"
+
+# Diary 日记（写入 src/content/diary，模板带 Diary、日常 标签）
+bun run diary:new -- "暑假-第二周"
 ```
 
-默认生成 `src/content/blog/暑假-第二周/暑假-第二周.md`，标题使用目录名，发布日期和更新日期使用 Asia/Singapore 时区的当天日期。模板默认包含 `Blog`、`日常` 标签和 `Chinese` 语言，不会写入 `draft`。
+标题使用目录名，发布日期和更新日期使用 Asia/Singapore 时区的当天日期，语言默认 `Chinese`，不会写入 `draft`。`diary:new` 等价于 `blog:new` 加 `--diary` 参数。
 
 如需让目录名、Markdown 文件名和文章标题不同，可以使用：
 
@@ -153,7 +160,7 @@ bun run blog:cover -- "src/content/blog/暑假-第二周/封面.png" --name chuy
 - `--force`：覆盖已经存在的目标 WebP。
 - `--remove-source`：转换并更新文章成功后删除原图。
 
-封面路径必须位于 `src/content/blog` 下的一级文章目录中，该目录必须且只能包含一个 Markdown 或 MDX 文件。未生成封面前，文章模板不会提前写入无效的 `heroImage` 路径。
+封面路径必须位于 `src/content/blog` 或 `src/content/diary` 下的一级文章目录中（脚本自动识别），该目录必须且只能包含一个 Markdown 或 MDX 文件。未生成封面前，文章模板不会提前写入无效的 `heroImage` 路径。
 
 运行 Blog 工具测试：
 

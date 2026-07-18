@@ -18,6 +18,7 @@
     "test:blog": "bun test scripts/blog",
     "blog:new": "bun scripts/blog/create.ts",
     "blog:cover": "bun scripts/blog/cover.ts",
+    "diary:new": "bun scripts/blog/create.ts --diary",
     "format:waline-history": "node scripts/waline/history-format.js",
     "yijiansilian": "bun lint && bun sync && bun check && bun format",
     "clean": "rm -rf .astro .vercel dist",

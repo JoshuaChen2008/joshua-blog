@@ -1,6 +1,8 @@
 import { relative, resolve, sep } from 'node:path'
 
-export const BLOG_RELATIVE_DIRECTORY = 'src/content/blog'
+export type ContentCollection = 'blog' | 'diary'
+
+export const CONTENT_COLLECTIONS: readonly ContentCollection[] = ['blog', 'diary']
 
 export class BlogToolError extends Error {
   public constructor(message: string) {
@@ -9,8 +11,11 @@ export class BlogToolError extends Error {
   }
 }
 
-export function getBlogDirectory(projectRoot: string): string {
-  return resolve(projectRoot, BLOG_RELATIVE_DIRECTORY)
+export function getContentDirectory(
+  projectRoot: string,
+  collection: ContentCollection = 'blog'
+): string {
+  return resolve(projectRoot, 'src/content', collection)
 }
 
 export function assertSafePathSegment(value: string, label: string): string {
@@ -41,18 +46,26 @@ export function assertSafePathSegment(value: string, label: string): string {
   return trimmedValue
 }
 
-export function assertDirectBlogDirectory(blogRoot: string, directory: string): void {
-  const relativeDirectory = relative(blogRoot, directory)
-  const segments = relativeDirectory.split(sep).filter(Boolean)
+export function resolveArticleCollection(
+  projectRoot: string,
+  articleDirectory: string
+): ContentCollection {
+  for (const collection of CONTENT_COLLECTIONS) {
+    const contentRoot = getContentDirectory(projectRoot, collection)
+    const relativeDirectory = relative(contentRoot, articleDirectory)
+    const segments = relativeDirectory.split(sep).filter(Boolean)
 
-  if (
-    !relativeDirectory ||
-    relativeDirectory === '..' ||
-    relativeDirectory.startsWith(`..${sep}`) ||
-    segments.length !== 1
-  ) {
-    throw new BlogToolError('封面图片必须位于 src/content/blog 下的一级文章目录中')
+    if (
+      relativeDirectory &&
+      relativeDirectory !== '..' &&
+      !relativeDirectory.startsWith(`..${sep}`) &&
+      segments.length === 1
+    ) {
+      return collection
+    }
   }
+
+  throw new BlogToolError('封面图片必须位于 src/content/blog 或 src/content/diary 下的一级文章目录中')
 }
 
 export function escapeYamlSingleQuoted(value: string): string {

@@ -28,11 +28,32 @@ describe('createBlog', () => {
     })
 
     const markdown = await readFile(result.markdownPath, 'utf8')
-    expect(result.markdownPath).toEndWith(join('暑假-第二周', '暑假-第二周.md'))
+    expect(result.markdownPath).toEndWith(
+      join('src', 'content', 'blog', '暑假-第二周', '暑假-第二周.md')
+    )
     expect(markdown).toContain("title: '暑假-第二周'")
     expect(markdown).toContain('publishDate: 2026-07-15')
+    expect(markdown).toContain('- Blog')
     expect(markdown).not.toContain('draft:')
     expect(markdown).not.toContain('heroImage:')
+  })
+
+  test('支持写入 diary 集合', async () => {
+    const projectRoot = await createProjectRoot()
+
+    const result = await createBlog({
+      projectRoot,
+      directoryName: '暑假-第三周',
+      collection: 'diary',
+      date: new Date('2026-07-14T16:30:00.000Z')
+    })
+
+    const markdown = await readFile(result.markdownPath, 'utf8')
+    expect(result.markdownPath).toEndWith(
+      join('src', 'content', 'diary', '暑假-第三周', '暑假-第三周.md')
+    )
+    expect(markdown).toContain('- Diary')
+    expect(markdown).toContain('- 日常')
   })
 
   test('支持自定义文件名并转义标题中的单引号', async () => {
@@ -67,7 +88,17 @@ describe('parseCreateArguments', () => {
     ).toEqual({
       directoryName: '期末月-第四周',
       fileName: 'Qimo4',
-      title: '期末月的第四周'
+      title: '期末月的第四周',
+      collection: 'blog'
+    })
+  })
+
+  test('支持 --diary 出现在目录名之前（diary:new 的调用方式）', () => {
+    expect(parseCreateArguments(['--diary', '暑假-第二周'])).toEqual({
+      directoryName: '暑假-第二周',
+      fileName: undefined,
+      title: undefined,
+      collection: 'diary'
     })
   })
 })
@@ -77,5 +108,6 @@ async function createProjectRoot(): Promise<string> {
   temporaryDirectories.push(projectRoot)
   await writeFile(join(projectRoot, 'placeholder'), '', 'utf8')
   await mkdir(join(projectRoot, 'src', 'content', 'blog'), { recursive: true })
+  await mkdir(join(projectRoot, 'src', 'content', 'diary'), { recursive: true })
   return projectRoot
 }

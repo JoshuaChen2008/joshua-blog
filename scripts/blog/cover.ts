@@ -3,12 +3,11 @@ import { basename, dirname, extname, resolve } from 'node:path'
 import sharp from 'sharp'
 
 import {
-  assertDirectBlogDirectory,
   assertSafePathSegment,
   BlogToolError,
   escapeYamlSingleQuoted,
   formatError,
-  getBlogDirectory
+  resolveArticleCollection
 } from './shared'
 
 interface ConvertCoverOptions {
@@ -45,6 +44,9 @@ const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/iu
 const HELP_TEXT = `用法：
   bun run blog:cover -- <文章目录内的图片> [选项]
 
+说明：
+  图片可以位于 src/content/blog 或 src/content/diary 下的一级文章目录中，脚本会自动识别。
+
 选项：
   --name <文件名>       指定输出文件名，扩展名固定为 .webp
   --quality <1-100>     WebP 质量，默认 82
@@ -54,14 +56,13 @@ const HELP_TEXT = `用法：
   --remove-source       转换成功后删除原图
 
 示例：
-  bun run blog:cover -- "src/content/blog/暑假-第二周/封面.png"
-  bun run blog:cover -- "src/content/blog/暑假-第二周/封面.png" --name cover --color "#FFE4B5"`
+  bun run blog:cover -- "src/content/blog/全栈开发实践/封面.png"
+  bun run blog:cover -- "src/content/diary/暑假-第二周/封面.png" --name cover --color "#FFE4B5"`
 
 export async function convertBlogCover(options: ConvertCoverOptions): Promise<ConvertedCover> {
   const inputPath = resolve(options.projectRoot, options.inputPath)
   const articleDirectory = dirname(inputPath)
-  const blogRoot = getBlogDirectory(options.projectRoot)
-  assertDirectBlogDirectory(blogRoot, articleDirectory)
+  resolveArticleCollection(options.projectRoot, articleDirectory)
   await assertRegularFile(inputPath)
 
   const markdownPath = await findArticleMarkdown(articleDirectory)
