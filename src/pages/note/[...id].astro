@@ -3,6 +3,7 @@ import { Image } from 'astro:assets'
 import { render, type CollectionEntry } from 'astro:content'
 import { getCollection } from 'astro:content'
 import PageLayout from '@/layouts/ContentLayout.astro'
+import NoteSidebar from '@/components/notes/NoteSidebar.astro'
 import { Comment, PageInfo } from '@/components/waline'
 import { Button, Icon } from 'astro-pure/user'
 
@@ -21,7 +22,7 @@ type Props = {
 }
 
 const { entry } = Astro.props
-const { Content } = await render(entry)
+const { Content, headings } = await render(entry)
 
 const {
   title,
@@ -169,6 +170,18 @@ const primaryColor = accentColor ?? heroImage?.color ?? 'hsl(var(--primary) / va
       )
     }
   </div>
+
+  <NoteSidebar
+    slot='sidebar'
+    {headings}
+    {type}
+    {status}
+    {tags}
+    {date}
+    {updatedDate}
+    {source}
+    relatedNotes={relatedNoteEntries}
+  />
 
   <article class='prose prose-pure dark:prose-invert max-w-none'>
     <Content />

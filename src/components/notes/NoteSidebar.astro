@@ -1,0 +1,139 @@
+---
+import type { MarkdownHeading } from 'astro'
+import type { CollectionEntry } from 'astro:content'
+import { statusColors, statusLabels, typeColors, typeLabels } from '@/lib/noteMeta'
+
+import { TOC } from 'astro-pure/components/pages'
+
+interface Props {
+  headings: MarkdownHeading[]
+  type: string
+  status: string
+  tags: string[]
+  date: Date
+  updatedDate?: Date
+  source?: string
+  relatedNotes?: CollectionEntry<'note'>[]
+}
+
+const { headings, type, status, tags, date, updatedDate, source, relatedNotes = [] } = Astro.props
+
+const showTableOfContents = headings.length > 1
+const visibleRelatedNotes = relatedNotes.slice(0, 3)
+const noteTypeLabel = typeLabels[type] || type
+const noteStatusLabel = statusLabels[status] || status
+---
+
+<nav aria-label='Note sidebar' class='w-full space-y-6'>
+  {
+    showTableOfContents ? (
+      <section aria-label='Table of contents' class='w-full'>
+        <TOC headings={headings} class='w-full' />
+      </section>
+    ) : (
+      <section aria-labelledby='note-info-heading' class='w-full'>
+        <h2 id='note-info-heading' class='font-medium'>
+          NOTE INFO
+        </h2>
+        <dl class='mt-4 space-y-3 text-sm'>
+          <div class='flex items-start justify-between gap-3'>
+            <dt class='text-muted-foreground'>Type</dt>
+            <dd class={`rounded-md px-2 py-0.5 text-right ${typeColors[type] || 'bg-muted'}`}>
+              {noteTypeLabel}
+            </dd>
+          </div>
+          <div class='flex items-start justify-between gap-3'>
+            <dt class='text-muted-foreground'>Status</dt>
+            <dd class={`rounded-md px-2 py-0.5 text-right ${statusColors[status] || 'bg-muted'}`}>
+              {noteStatusLabel}
+            </dd>
+          </div>
+          <div class='flex items-start justify-between gap-3'>
+            <dt class='text-muted-foreground'>Created</dt>
+            <dd class='text-right'>
+              <time datetime={date.toISOString()}>
+                {date.toLocaleDateString('zh-CN', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+                })}
+              </time>
+            </dd>
+          </div>
+          {updatedDate && (
+            <div class='flex items-start justify-between gap-3'>
+              <dt class='text-muted-foreground'>Updated</dt>
+              <dd class='text-right'>
+                <time datetime={updatedDate.toISOString()}>
+                  {updatedDate.toLocaleDateString('zh-CN', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                  })}
+                </time>
+              </dd>
+            </div>
+          )}
+          {source && (
+            <div class='space-y-1'>
+              <dt class='text-muted-foreground'>Source</dt>
+              <dd class='break-all'>
+                <a href={source} target='_blank' rel='noopener noreferrer' class='hover:underline'>
+                  {source}
+                </a>
+              </dd>
+            </div>
+          )}
+        </dl>
+      </section>
+    )
+  }
+
+  {
+    tags.length > 0 && (
+      <section aria-labelledby='note-tags-heading' class='w-full'>
+        <h2 id='note-tags-heading' class='font-medium'>
+          TAGS
+        </h2>
+        <ul class='mt-3 flex flex-wrap gap-2'>
+          {tags.map((tag) => (
+            <li>
+              <a
+                href={`/note/tags/${tag}`}
+                class='inline-block rounded-md border border-border px-2 py-1 text-sm transition hover:border-foreground/20'
+              >
+                {tag}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    visibleRelatedNotes.length > 0 && (
+      <section aria-labelledby='related-notes-heading' class='w-full'>
+        <h2 id='related-notes-heading' class='font-medium'>
+          RELATED NOTES
+        </h2>
+        <ul class='mt-3 space-y-2'>
+          {visibleRelatedNotes.map((note) => (
+            <li>
+              <a
+                href={`/note/${note.id}`}
+                class='block w-full rounded-lg border border-border bg-card p-3 text-sm transition hover:border-foreground/20 hover:bg-muted'
+                data-astro-prefetch
+              >
+                <span class='block font-medium'>{note.data.title}</span>
+                <span class='mt-1 block text-xs text-muted-foreground'>
+                  {typeLabels[note.data.type] || note.data.type}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</nav>
