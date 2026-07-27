@@ -1,8 +1,10 @@
-import { relative, resolve, sep } from 'node:path'
+import { isAbsolute, relative, resolve, sep } from 'node:path'
+import { slug as githubSlug } from 'github-slugger'
 
-export type ContentCollection = 'blog' | 'diary'
-
-export const CONTENT_COLLECTIONS: readonly ContentCollection[] = ['blog', 'diary']
+export const POST_COLLECTIONS = ['blog', 'diary'] as const
+export const ALL_COLLECTIONS = ['blog', 'diary', 'note'] as const
+export type PostCollection = (typeof POST_COLLECTIONS)[number]
+export type ContentCollection = (typeof ALL_COLLECTIONS)[number]
 
 export class BlogToolError extends Error {
   public constructor(message: string) {
@@ -49,8 +51,8 @@ export function assertSafePathSegment(value: string, label: string): string {
 export function resolveArticleCollection(
   projectRoot: string,
   articleDirectory: string
-): ContentCollection {
-  for (const collection of CONTENT_COLLECTIONS) {
+): PostCollection {
+  for (const collection of POST_COLLECTIONS) {
     const contentRoot = getContentDirectory(projectRoot, collection)
     const relativeDirectory = relative(contentRoot, articleDirectory)
     const segments = relativeDirectory.split(sep).filter(Boolean)
@@ -65,7 +67,47 @@ export function resolveArticleCollection(
     }
   }
 
-  throw new BlogToolError('封面图片必须位于 src/content/blog 或 src/content/diary 下的一级文章目录中')
+  throw new BlogToolError(
+    '封面图片必须位于 src/content/blog 或 src/content/diary 下的一级文章目录中'
+  )
+}
+
+export function assertPathInside(
+  parentDirectory: string,
+  candidatePath: string,
+  label: string
+): string {
+  const resolvedParent = resolve(parentDirectory)
+  const resolvedCandidate = resolve(candidatePath)
+  const relativePath = relative(resolvedParent, resolvedCandidate)
+
+  if (
+    !relativePath ||
+    relativePath === '..' ||
+    relativePath.startsWith(`..${sep}`) ||
+    isAbsolute(relativePath)
+  ) {
+    throw new BlogToolError(`${label}必须位于 ${resolvedParent} 内`)
+  }
+
+  return resolvedCandidate
+}
+
+/** 与 Astro glob loader 的默认 id 生成规则保持一致。 */
+export function deriveEntryId(relativeMarkdownPath: string, frontmatterSlug?: unknown): string {
+  if (typeof frontmatterSlug === 'string' && frontmatterSlug) return frontmatterSlug
+
+  const normalizedPath = relativeMarkdownPath.replaceAll('\\', '/').replace(/^\/+|\/+$/gu, '')
+  const withoutExtension = normalizedPath.replace(/\.(?:md|mdx)$/iu, '')
+  const slug = withoutExtension
+    .split('/')
+    .filter(Boolean)
+    .map((segment) => githubSlug(segment))
+    .join('/')
+    .replace(/\/index$/u, '')
+
+  if (!slug) throw new BlogToolError('无法从 Markdown 路径生成条目 id')
+  return slug
 }
 
 export function escapeYamlSingleQuoted(value: string): string {

@@ -7,6 +7,12 @@
       "runtimeArgs": ["run", "dev"],
       "port": 4321,
       "autoPort": true
+    },
+    {
+      "name": "blog-studio",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "blog:studio"],
+      "port": 4399
     }
   ]
 }

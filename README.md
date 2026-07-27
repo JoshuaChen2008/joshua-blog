@@ -77,6 +77,12 @@ bun run blog:new -- "全栈开发实践"
 # 创建带独立目录的 Diary（日记）模板
 bun run diary:new -- "暑假-第二周"
 
+# 创建平铺路径的 Note（笔记）模板
+bun run note:new -- "Astro 内容集合"
+
+# 启动本地 Blog Studio 可视化编辑器
+bun run blog:studio
+
 # 将文章目录中的封面转为 WebP，并自动写入 heroImage（blog 和 diary 均可）
 bun run blog:cover -- "src/content/diary/暑假-第二周/封面.png"
 
@@ -90,14 +96,56 @@ bun run lint
 bun run yijiansilian
 ```
 
+## Blog Studio 可视化文章编辑器
+
+Blog Studio 是仅供本地使用的文章编辑器，可创建 `blog`、`diary` 和 `note` 三类内容。它会直接在当前仓库中生成 Markdown 文件，不会被打包或部署到博客站点。
+
+使用 Bun 启动：
+
+```shell
+bun run blog:studio
+```
+
+Windows 也可以双击仓库根目录中的 `blog-studio.bat`，或在终端中传入自定义端口：
+
+```bat
+blog-studio.bat
+blog-studio.bat --port 4400
+```
+
+使用 Bun 时可通过下面的方式传递端口参数：
+
+```shell
+bun run blog:studio -- --port 4400
+```
+
+默认访问地址为 `http://127.0.0.1:4399`。服务只监听本机回环地址。
+
+编辑器支持：
+
+- 实时预览最终文件路径并在提交前探测冲突。
+- 按集合生成对应的 frontmatter 格式和可选字段。
+- 从 Markdown 文件或粘贴内容中导入文章，并保留无法识别的 frontmatter 字段。
+- 从一级标题和正文派生标题、摘要，导入产生的推断值会在界面中提示。
+- 使用预设快速填写标题、目录名、标签和正文。
+- 为 `blog`、`diary` 转换并设置封面；`note` 使用平铺文件且不接受封面。
+
 ## 文章创建与封面处理
 
-站点分为两个文章板块：`src/content/blog/`（Blog，正式文章）和 `src/content/diary/`（Diary，日常日记）。每篇文章使用独立目录存放 Markdown 和封面图片：
+站点内容分为三个集合：
+
+| 集合 | 存储方式 | 默认 Markdown 路径 | 封面 |
+| --- | --- | --- | --- |
+| `blog` | 每篇文章使用独立目录 | `src/content/blog/<目录名>/index.md` | 支持 |
+| `diary` | 每篇日记使用独立目录 | `src/content/diary/<目录名>/index.md` | 支持 |
+| `note` | 直接使用平铺文件 | `src/content/note/<文件名>.md` | 不支持 |
+
+例如，一篇带封面的 Diary 目录如下：
 
 ```text
 src/content/diary/
 └─ 暑假-第二周/
-   ├─ 暑假-第二周.md
+   ├─ index.md
    └─ 封面.webp
 ```
 
@@ -111,9 +159,12 @@ bun run blog:new -- "全栈开发实践"
 
 # Diary 日记（写入 src/content/diary，模板带 Diary、日常 标签）
 bun run diary:new -- "暑假-第二周"
+
+# Note 笔记（直接写入 src/content/note，不创建同名目录）
+bun run note:new -- "Astro 内容集合"
 ```
 
-标题使用目录名，发布日期和更新日期使用 Asia/Singapore 时区的当天日期，语言默认 `Chinese`，不会写入 `draft`。`diary:new` 等价于 `blog:new` 加 `--diary` 参数。
+`blog:new` 和 `diary:new` 默认创建 `<目录名>/index.md`，`note:new` 默认创建同名的平铺 Markdown 文件。标题默认使用传入的名称，发布日期和更新日期使用 Asia/Singapore 时区的当天日期，语言默认 `Chinese`，不会写入 `draft`。`diary:new` 等价于 `blog:new` 加 `--diary` 参数。
 
 如需让目录名、Markdown 文件名和文章标题不同，可以使用：
 
@@ -121,7 +172,7 @@ bun run diary:new -- "暑假-第二周"
 bun run blog:new -- "期末月-第四周" --file Qimo4 --title "期末月的第四周"
 ```
 
-这会生成 `src/content/blog/期末月-第四周/Qimo4.md`。命令不会覆盖已有目录。
+这会生成 `src/content/blog/期末月-第四周/Qimo4.md`。命令不会覆盖已有的文章目录或 Note 文件。
 
 ### 转换并设置封面
 

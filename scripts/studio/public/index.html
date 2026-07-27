@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Blog Studio</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>Blog Studio</h1>
+        <span class="badge">本地模式 · 仅写入当前仓库</span>
+      </div>
+      <div class="topbar-right">
+        <label class="field-inline">
+          <span>预设</span>
+          <select id="presetSelect">
+            <option value="">不使用</option>
+          </select>
+        </label>
+        <button type="button" class="btn-ghost" id="savePresetBtn">保存为预设</button>
+        <button type="button" class="btn-ghost" id="deletePresetBtn" disabled>删除预设</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <!-- ── 左栏：表单 ───────────────────────────────── -->
+      <div class="pane pane-form">
+        <section class="block">
+          <h2 class="block-title">1 · 选择类型</h2>
+          <div class="collection-grid" id="collectionGrid"></div>
+        </section>
+
+        <section class="block">
+          <h2 class="block-title">2 · 位置</h2>
+          <div class="row" id="locationRow">
+            <label class="field" id="directoryField">
+              <span class="field-label">目录名</span>
+              <input type="text" id="directoryName" placeholder="暑假-第二周" autocomplete="off" />
+              <span class="field-error" id="directoryError"></span>
+            </label>
+            <label class="field">
+              <span class="field-label">
+                文件名
+                <span class="field-hint" id="fileNameHint">默认 index.md</span>
+              </span>
+              <input type="text" id="fileName" placeholder="index.md" autocomplete="off" />
+              <span class="field-error" id="fileError"></span>
+            </label>
+          </div>
+          <div class="path-preview" id="pathPreview">
+            <span class="path-caption">将创建</span>
+            <code id="pathText">src/content/blog/</code>
+            <span class="path-status" id="pathStatus"></span>
+          </div>
+        </section>
+
+        <section class="block">
+          <h2 class="block-title">3 · 必填字段</h2>
+          <div class="fields" id="requiredFields"></div>
+        </section>
+
+        <section class="block">
+          <div class="block-head">
+            <h2 class="block-title">4 · 可选字段</h2>
+            <span class="block-note" id="optionalCount"></span>
+          </div>
+          <div class="toggles" id="optionalFields"></div>
+        </section>
+
+        <section class="block">
+          <h2 class="block-title">5 · 内容</h2>
+          <div class="tabs" id="bodyTabs">
+            <button type="button" class="tab is-active" data-mode="empty">空模板</button>
+            <button type="button" class="tab" data-mode="paste">粘贴正文</button>
+            <button type="button" class="tab" data-mode="file">拖入文件</button>
+          </div>
+
+          <div class="tab-panel" data-panel="empty">
+            <p class="muted">只生成 frontmatter，正文留空。</p>
+          </div>
+
+          <div class="tab-panel is-hidden" data-panel="paste">
+            <textarea
+              id="pasteInput"
+              rows="10"
+              placeholder="把文章正文粘贴到这里。&#10;&#10;· 若内容已带 frontmatter，会解析出来预填上面的表单，不会重复包一层&#10;· 若没有，会取第一个 # 标题作为文章标题，并从正文中移除该行"
+            ></textarea>
+          </div>
+
+          <div class="tab-panel is-hidden" data-panel="file">
+            <div class="dropzone" id="mdDropzone">
+              <strong>拖入 .md / .mdx / .txt 文件</strong>
+              <span class="muted">或点击选择</span>
+              <input type="file" id="mdFileInput" accept=".md,.mdx,.txt" hidden />
+            </div>
+          </div>
+
+          <div class="notice is-hidden" id="importNotice"></div>
+        </section>
+
+        <section class="block" id="coverBlock">
+          <h2 class="block-title">6 · 封面</h2>
+          <div class="cover-row">
+            <div class="dropzone dropzone-sm" id="coverDropzone">
+              <strong>拖入封面图</strong>
+              <span class="muted">转 WebP · 最大宽 1920 · 质量 82</span>
+              <input type="file" id="coverInput" accept="image/*" hidden />
+            </div>
+            <div class="cover-meta is-hidden" id="coverMeta">
+              <div class="swatch" id="coverSwatch"></div>
+              <div>
+                <div class="cover-name" id="coverName"></div>
+                <label class="field-inline">
+                  <span>主色</span>
+                  <input
+                    type="text"
+                    id="coverColor"
+                    placeholder="留空则自动提取"
+                    spellcheck="false"
+                  />
+                </label>
+              </div>
+              <button type="button" class="btn-ghost" id="coverClear">移除</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="actionbar">
+          <div class="validation" id="validation"></div>
+          <button type="button" class="btn-primary" id="createBtn">生成文章</button>
+        </div>
+
+        <section class="result-box is-hidden" id="resultBox" aria-live="polite">
+          <div>
+            <strong id="resultTitle">文章已生成</strong>
+            <p id="resultMessage"></p>
+          </div>
+          <div class="result-actions">
+            <button type="button" class="btn-ghost" id="openResultBtn">打开所在文件夹</button>
+            <button type="button" class="btn-ghost" id="copyPathBtn">复制路径</button>
+          </div>
+        </section>
+      </div>
+
+      <!-- ── 右栏：预览 ───────────────────────────────── -->
+      <aside class="pane pane-preview">
+        <div class="preview-head">
+          <h2 class="block-title">预览</h2>
+          <button type="button" class="btn-ghost" id="copyBtn">复制</button>
+        </div>
+        <pre class="preview-code" id="preview"></pre>
+        <dl class="stats" id="stats"></dl>
+      </aside>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

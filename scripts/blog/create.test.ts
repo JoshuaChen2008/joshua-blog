@@ -28,9 +28,7 @@ describe('createBlog', () => {
     })
 
     const markdown = await readFile(result.markdownPath, 'utf8')
-    expect(result.markdownPath).toEndWith(
-      join('src', 'content', 'blog', '暑假-第二周', '暑假-第二周.md')
-    )
+    expect(result.markdownPath).toEndWith(join('src', 'content', 'blog', '暑假-第二周', 'index.md'))
     expect(markdown).toContain("title: '暑假-第二周'")
     expect(markdown).toContain('publishDate: 2026-07-15')
     expect(markdown).toContain('- Blog')
@@ -50,7 +48,7 @@ describe('createBlog', () => {
 
     const markdown = await readFile(result.markdownPath, 'utf8')
     expect(result.markdownPath).toEndWith(
-      join('src', 'content', 'diary', '暑假-第三周', '暑假-第三周.md')
+      join('src', 'content', 'diary', '暑假-第三周', 'index.md')
     )
     expect(markdown).toContain('- Diary')
     expect(markdown).toContain('- 日常')
@@ -78,6 +76,23 @@ describe('createBlog', () => {
     await createBlog(options)
 
     await expect(createBlog(options)).rejects.toThrow()
+  })
+
+  test('note 使用平铺布局并生成真实 entry id', async () => {
+    const projectRoot = await createProjectRoot()
+    const result = await createBlog({
+      projectRoot,
+      directoryName: 'RAG Demo',
+      collection: 'note',
+      date: new Date('2026-07-26T16:30:00.000Z')
+    })
+
+    const markdown = await readFile(result.markdownPath, 'utf8')
+    expect(result.directoryPath).toBeUndefined()
+    expect(result.markdownPath).toEndWith(join('src', 'content', 'note', 'RAG Demo.md'))
+    expect(result.entryId).toBe('rag-demo')
+    expect(markdown).toContain('title: "RAG Demo"')
+    expect(markdown).toContain('date: 2026-07-27')
   })
 })
 
@@ -109,5 +124,6 @@ async function createProjectRoot(): Promise<string> {
   await writeFile(join(projectRoot, 'placeholder'), '', 'utf8')
   await mkdir(join(projectRoot, 'src', 'content', 'blog'), { recursive: true })
   await mkdir(join(projectRoot, 'src', 'content', 'diary'), { recursive: true })
+  await mkdir(join(projectRoot, 'src', 'content', 'note'), { recursive: true })
   return projectRoot
 }

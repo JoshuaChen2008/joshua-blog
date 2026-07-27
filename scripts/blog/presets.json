@@ -1,0 +1,13 @@
+[
+  {
+    "name": "周记",
+    "collection": "diary",
+    "enabled": ["updatedDate", "language"],
+    "fields": {
+      "title": "期末月-第{{n}}周",
+      "tags": ["Diary", "日常"],
+      "language": "Chinese"
+    },
+    "directoryName": "期末月-第{{n}}周"
+  }
+]
