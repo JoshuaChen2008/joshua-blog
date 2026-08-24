@@ -110,6 +110,12 @@
             "labelSide": "left",
             "zIndex": 2
           }
+        },
+        {
+          "name": "Wutong Yu",
+          "desc": "Record of Technology, Open Source, and Personal Thoughts",
+          "link": "https://www.wutongyu.site/",
+          "avatar": "https://www.wutongyu.site/avatar.webp"
         }
       ]
     },
