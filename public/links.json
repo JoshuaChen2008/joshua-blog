@@ -110,6 +110,12 @@
             "labelSide": "left",
             "zIndex": 2
           }
+        },
+        {
+          "name": "梧桐雨の博客",
+          "desc": "关于我的代码和生活",
+          "link": "https://www.wutongyu.site/",
+          "avatar": "https://www.wutongyu.site/avatar.webp"
         }
       ]
     },
